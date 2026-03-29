@@ -2,13 +2,19 @@ import '../globals.css';
 import { Inter } from 'next/font/google';
 import Navbar from '@/components/shared/navbar';
 import { Locale } from '@/types';
+import { getDictionary } from '@/lib/i18n/get-dictionary';
 
 const inter = Inter({ subsets: ['latin', 'cyrillic'] });
 
-export const metadata = {
-  title: 'UzDev Hub - IT-маркетплейс Узбекистана',
-  description: 'Лучшие IT-специалисты Узбекистана: Telegram-боты, сайты, дизайн и игровые серверы.',
-};
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
+  const { lang } = await params;
+  const dictionary = await getDictionary(lang as Locale);
+  
+  return {
+    title: `UzDev Hub - ${lang === 'ru' ? 'IT-маркетплейс Узбекистана' : 'O\'zbekiston IT-marketpleysi'}`,
+    description: dictionary.hero.subtitle,
+  };
+}
 
 export default async function RootLayout({
   children,

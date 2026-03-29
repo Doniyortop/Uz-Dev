@@ -38,7 +38,7 @@ export default async function Home({
           
           <h1 className="text-5xl md:text-7xl font-bold mb-8 text-white leading-tight tracking-tight">
             {dictionary.hero.title.split(' ').map((word, i) => (
-              <span key={i} className={word === 'IT-специалистов' || word === 'IT' ? 'text-primary' : ''}>
+              <span key={i} className={word.toLowerCase().includes('it') ? 'text-primary' : ''}>
                 {word}{' '}
               </span>
             ))}

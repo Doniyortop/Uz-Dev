@@ -102,7 +102,7 @@ export default async function FreelancerProfile({
                    <div className="w-6 h-6 bg-primary rounded-full opacity-50" />
                 </div>
                 <p className="text-slate-400 font-medium">
-                  {lang === 'ru' ? 'Все услуги этого фрилансера' : 'Frielanserni barcha xizmatlari'}
+                  {lang === 'ru' ? 'Все услуги этого фрилансера' : 'Freelancerning barcha xizmatlari'}
                 </p>
               </Card>
             </div>

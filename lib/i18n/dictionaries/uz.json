@@ -1,20 +1,20 @@
 {
   "common": {
-    "contact_tg": "Telegram орқали боғланиш",
-    "categories": "Категориялар",
-    "search": "Қидирув",
-    "login": "Кириш",
-    "register": "Рўйхатдан ўтиш"
+    "contact_tg": "Telegram orqali bog'lanish",
+    "categories": "Kategoriyalar",
+    "search": "Qidiruv",
+    "login": "Kirish",
+    "register": "Ro'yxatdan o'tish"
   },
   "hero": {
-    "title": "Ўзбекистоннинг энг яхши IT мутахассисларини топинг",
-    "subtitle": "Хизматлар бозори: Telegram ботлардан тортиб мураккаб тизимларгача",
-    "cta": "Ижрочини топиш"
+    "title": "O'zbekistonning eng yaxshi IT mutaxassislarini toping",
+    "subtitle": "Xizmatlar bozori: Telegram botlardan tortib murakkab tizimlargacha",
+    "cta": "Ijrochini topish"
   },
   "categories": {
-    "tg_bots": "Telegram ботлар",
-    "web_dev": "Сайтлар яратиш",
-    "design": "Дизайн",
-    "game_servers": "Ўйин серверлари"
+    "tg_bots": "Telegram botlar",
+    "web_dev": "Saytlar yaratish",
+    "design": "Dizayn",
+    "game_servers": "O'yin serverlari"
   }
 }
