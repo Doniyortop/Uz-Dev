@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { Locale } from '@/types';
 import { getDictionary } from '@/lib/i18n/get-dictionary';
@@ -11,19 +11,33 @@ export default function Navbar({ lang }: { lang: Locale }) {
   const [isAuth, setIsAuth] = useState(false);
   const [dictionary, setDictionary] = useState<any>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Initial check
-    setIsAuth(localStorage.getItem('is_auth') === 'true');
+    const checkAuth = () => {
+      setIsAuth(localStorage.getItem('is_auth') === 'true');
+    };
+    
+    checkAuth();
     getDictionary(lang).then(setDictionary);
 
     // Listen for auth changes
-    const handleAuthChange = () => {
-      setIsAuth(localStorage.getItem('is_auth') === 'true');
+    window.addEventListener('auth-change', checkAuth);
+    
+    // Close menu on click outside
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
     };
 
-    window.addEventListener('auth-change', handleAuthChange);
-    return () => window.removeEventListener('auth-change', handleAuthChange);
+    document.addEventListener('mousedown', handleClickOutside);
+    
+    return () => {
+      window.removeEventListener('auth-change', checkAuth);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, [lang]);
 
   const handleLogout = () => {
@@ -65,9 +79,12 @@ export default function Navbar({ lang }: { lang: Locale }) {
           </Link>
 
           {isAuth ? (
-            <div className="relative">
+            <div className="relative" ref={menuRef}>
               <button 
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsMenuOpen(!isMenuOpen);
+                }}
                 className="flex items-center gap-3 pl-3 pr-2 py-1.5 rounded-full bg-dark-800 border border-dark-700 hover:border-primary/50 transition-all group"
               >
                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm">
@@ -78,7 +95,7 @@ export default function Navbar({ lang }: { lang: Locale }) {
               </button>
 
               {isMenuOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-dark-800 border border-dark-700 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
+                <div className="absolute right-0 mt-2 w-56 bg-dark-800 border border-dark-700 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200 z-50">
                   <div className="p-2 space-y-1">
                     <Link 
                       href={`/${lang}/dashboard`}
