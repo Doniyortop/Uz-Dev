@@ -58,17 +58,13 @@ export default async function Home({
           
           <FadeIn delay={0.6}>
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-              <Link href={`/${lang}/services`} className="w-full sm:w-auto">
-                <Button size="lg" className="w-full group">
-                  {dictionary.hero.cta}
-                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-              <Link href={`/${lang}/services`} className="w-full sm:w-auto">
-                <Button variant="outline" size="lg" className="w-full">
-                  {dictionary.common.categories}
-                </Button>
-              </Link>
+              <Button size="lg" href={`/${lang}/services`} className="w-full sm:w-auto group">
+                {dictionary.hero.cta}
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+              <Button variant="outline" size="lg" href={`/${lang}/services`} className="w-full sm:w-auto">
+                {dictionary.common.categories}
+              </Button>
             </div>
           </FadeIn>
         </div>

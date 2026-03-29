@@ -31,16 +31,12 @@ export default async function Navbar({ lang }: { lang: Locale }) {
               {lang === 'ru' ? 'UZ' : 'RU'}
             </span>
           </Link>
-          <Link href={`/${lang}/login`}>
-            <Button variant="ghost" className="hidden sm:inline-flex">
-              {dictionary.common.login}
-            </Button>
-          </Link>
-          <Link href={`/${lang}/register`}>
-            <Button variant="primary">
-              {dictionary.common.register}
-            </Button>
-          </Link>
+          <Button variant="ghost" href={`/${lang}/login`} className="hidden sm:inline-flex">
+            {dictionary.common.login}
+          </Button>
+          <Button variant="primary" href={`/${lang}/register`}>
+            {dictionary.common.register}
+          </Button>
         </div>
       </div>
     </nav>
