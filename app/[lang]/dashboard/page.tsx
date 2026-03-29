@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { Locale } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -12,31 +12,25 @@ export default function DashboardPage({
 }: {
   params: Promise<{ lang: Locale }>;
 }) {
+  const { lang } = use(params);
   const router = useRouter();
   const [role, setRole] = useState<string | null>(null);
-  const [lang, setLang] = useState<Locale | null>(null);
 
   useEffect(() => {
-    params.then((p) => {
-      setLang(p.lang);
-      const savedRole = localStorage.getItem('user_role');
-      if (!savedRole) {
-        router.push(`/${p.lang}/login`);
-      }
-      setRole(savedRole);
-    });
-  }, [router, params]);
+    const savedRole = localStorage.getItem('user_role');
+    if (!savedRole) {
+      router.push(`/${lang}/login`);
+    }
+    setRole(savedRole);
+  }, [router, lang]);
 
   const handleLogout = () => {
-    if (!lang) return;
     localStorage.removeItem('is_auth');
     localStorage.removeItem('user_role');
     localStorage.removeItem('onboarded');
     window.dispatchEvent(new Event('auth-change'));
     router.push(`/${lang}`);
   };
-
-  if (!lang) return null;
 
   return (
     <div className="container mx-auto px-4 py-12">

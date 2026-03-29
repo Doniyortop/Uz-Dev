@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { Locale } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -12,17 +12,13 @@ export default function OnboardingPage({
 }: {
   params: Promise<{ lang: Locale }>;
 }) {
+  const { lang } = use(params);
   const router = useRouter();
   const [role, setRole] = useState<'freelancer' | 'client' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [lang, setLang] = useState<Locale | null>(null);
-
-  useState(() => {
-    params.then((p) => setLang(p.lang));
-  });
 
   const handleComplete = () => {
-    if (!role || !lang) return;
+    if (!role) return;
     setIsLoading(true);
     // Simulate API call
     setTimeout(() => {
@@ -31,8 +27,6 @@ export default function OnboardingPage({
       router.push(`/${lang}/dashboard`);
     }, 1500);
   };
-
-  if (!lang) return null;
 
   return (
     <div className="container mx-auto px-4 py-20 flex justify-center items-center">

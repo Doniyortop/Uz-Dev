@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, use, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getDictionary } from '@/lib/i18n/get-dictionary';
 import { Locale } from '@/types';
@@ -13,22 +13,18 @@ export default function RegisterPage({
 }: {
   params: Promise<{ lang: Locale }>;
 }) {
+  const { lang } = use(params);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [dictionary, setDictionary] = useState<any>(null);
-  const [lang, setLang] = useState<Locale | null>(null);
 
   // Load dictionary on client
-  useState(() => {
-    params.then((p) => {
-      setLang(p.lang);
-      getDictionary(p.lang).then(setDictionary);
-    });
-  });
+  useEffect(() => {
+    getDictionary(lang).then(setDictionary);
+  }, [lang]);
 
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!lang) return;
     setIsLoading(true);
     
     // Simulate Auth logic
