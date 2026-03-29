@@ -1,0 +1,20 @@
+{
+  "common": {
+    "contact_tg": "Связаться в Telegram",
+    "categories": "Категории",
+    "search": "Поиск",
+    "login": "Войти",
+    "register": "Регистрация"
+  },
+  "hero": {
+    "title": "Найди лучших IT-специалистов Узбекистана",
+    "subtitle": "Маркетплейс услуг: от Telegram-ботов до сложных систем",
+    "cta": "Найти исполнителя"
+  },
+  "categories": {
+    "tg_bots": "Telegram-боты",
+    "web_dev": "Разработка сайтов",
+    "design": "Дизайн",
+    "game_servers": "Игровые серверы"
+  }
+}
