@@ -3,7 +3,7 @@ import { Locale } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Star, Send, ExternalLink } from 'lucide-react';
+import { MessageCircle, Star, Send, ExternalLink, ShieldCheck } from 'lucide-react';
 
 export default async function FreelancerProfile({
   params,
