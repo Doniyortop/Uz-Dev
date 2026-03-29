@@ -2,7 +2,7 @@ import { Service, Locale } from '@/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MessageCircle, Star } from 'lucide-react';
+import { MessageCircle, Star, ShieldCheck } from 'lucide-react';
 
 import Link from 'next/link';
 
@@ -22,10 +22,15 @@ export function ServiceCard({ service, lang }: ServiceCardProps) {
           <div className="relative h-48 w-full bg-dark-700">
             <div className="absolute inset-0 bg-gradient-to-t from-dark-900/80 to-transparent" />
             <div className="absolute bottom-4 left-4 flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-[10px] font-bold">
+              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-[10px] font-bold relative group/avatar">
                 DEV
+                <div className="absolute -top-1 -right-1 bg-white rounded-full p-0.5 shadow-sm">
+                  <ShieldCheck className="w-3 h-3 text-primary" />
+                </div>
               </div>
-              <div className="text-xs text-white font-medium">Freelancer Name</div>
+              <div className="text-xs text-white font-medium flex items-center gap-1">
+                Freelancer Name
+              </div>
             </div>
           </div>
         </CardHeader>

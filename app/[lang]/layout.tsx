@@ -1,6 +1,7 @@
 import '../globals.css';
 import { Inter } from 'next/font/google';
 import Navbar from '@/components/shared/navbar';
+import Footer from '@/components/shared/footer';
 import { Locale } from '@/types';
 import { getDictionary } from '@/lib/i18n/get-dictionary';
 
@@ -26,10 +27,10 @@ export default async function RootLayout({
   const { lang } = await params;
   return (
     <html lang={lang}>
-      <body className={`${inter.className} min-h-screen bg-dark-900 text-foreground`}>
+      <body className={`${inter.className} min-h-screen bg-dark-900 text-foreground flex flex-col`}>
         <Navbar lang={lang as Locale} />
-        <main>{children}</main>
-        {/* Footer will go here */}
+        <main className="flex-grow">{children}</main>
+        <Footer lang={lang as Locale} />
       </body>
     </html>
   );

@@ -33,8 +33,11 @@ export default async function FreelancerProfile({
         <div className="lg:col-span-1">
           <Card className="sticky top-24">
             <CardHeader className="flex flex-col items-center pb-2">
-              <div className="w-32 h-32 rounded-full overflow-hidden mb-6 border-4 border-primary/20 p-1">
+              <div className="w-32 h-32 rounded-full overflow-hidden mb-6 border-4 border-primary/20 p-1 relative">
                 <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full rounded-full object-cover" />
+                <div className="absolute bottom-1 right-1 bg-white rounded-full p-1.5 shadow-lg border-2 border-primary/20">
+                  <ShieldCheck className="w-6 h-6 text-primary" />
+                </div>
               </div>
               <CardTitle className="text-2xl text-center mb-2">{profile.full_name}</CardTitle>
               <div className="flex items-center gap-2 mb-4">
