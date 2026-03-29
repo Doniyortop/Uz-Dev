@@ -120,7 +120,7 @@ export default async function ServicePage({
                 </div>
               </div>
 
-              <Button className="w-full gap-3 py-8 text-xl" size="lg">
+              <Button className="w-full gap-3 py-8 text-xl" size="lg" href="#">
                 <Send className="w-6 h-6" />
                 {dictionary.common.contact_tg}
               </Button>

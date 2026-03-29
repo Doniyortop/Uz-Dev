@@ -60,7 +60,7 @@ export default async function FreelancerProfile({
                 ))}
               </div>
               <div className="pt-6 border-t border-dark-700">
-                <Button className="w-full gap-2 text-lg py-6" size="lg">
+                <Button className="w-full gap-2 text-lg py-6" size="lg" href="#">
                   <Send className="w-5 h-5" />
                   {dictionary.common.contact_tg}
                 </Button>

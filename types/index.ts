@@ -15,6 +15,8 @@ export interface Profile {
   bio: string;
   telegram_username: string;
   rating: number;
+  role?: 'freelancer' | 'client';
+  onboarded?: boolean;
 }
 
 export interface Service {
