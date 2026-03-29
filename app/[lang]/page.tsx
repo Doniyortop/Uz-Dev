@@ -3,6 +3,7 @@ import { Locale } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Bot, Code, Paintbrush, Gamepad2, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 export default async function Home({
   params,
@@ -49,13 +50,17 @@ export default async function Home({
           </p>
           
           <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
-            <Button size="lg" className="w-full sm:w-auto group">
-              {dictionary.hero.cta}
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button variant="outline" size="lg" className="w-full sm:w-auto">
-              {dictionary.common.categories}
-            </Button>
+            <Link href={`/${lang}/services`} className="w-full sm:w-auto">
+              <Button size="lg" className="w-full group">
+                {dictionary.hero.cta}
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+            <Link href={`/${lang}/services`} className="w-full sm:w-auto">
+              <Button variant="outline" size="lg" className="w-full">
+                {dictionary.common.categories}
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
@@ -72,23 +77,25 @@ export default async function Home({
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {categories.map(({ key, icon: Icon }) => (
-              <Card key={key} className="p-8 flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-dark-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary/10 group-hover:scale-110 transition-all duration-300">
-                  <Icon className="w-8 h-8 text-primary" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">
-                  {dictionary.categories[key as keyof typeof dictionary.categories]}
-                </h3>
-                <p className="text-slate-400 text-sm mb-6">
-                  {lang === 'ru' ? 'Найти лучших экспертов' : 'Eng yaxshi mutaxassislarni toping'}
-                </p>
-                <div className="mt-auto pt-4 border-t border-dark-700 w-full group-hover:border-primary/20 transition-colors">
-                  <span className="text-primary text-sm font-medium inline-flex items-center group-hover:gap-2 transition-all">
-                    {lang === 'ru' ? 'Смотреть услуги' : 'Xizmatlarni ko\'rish'}
-                    <ArrowRight className="ml-1 w-4 h-4" />
-                  </span>
-                </div>
-              </Card>
+              <Link key={key} href={`/${lang}/services?category=${key}`}>
+                <Card className="p-8 flex flex-col items-center text-center h-full">
+                  <div className="w-16 h-16 bg-dark-800 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-primary/10 group-hover:scale-110 transition-all duration-300">
+                    <Icon className="w-8 h-8 text-primary" />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-3">
+                    {dictionary.categories[key as keyof typeof dictionary.categories]}
+                  </h3>
+                  <p className="text-slate-400 text-sm mb-6">
+                    {lang === 'ru' ? 'Найти лучших экспертов' : 'Eng yaxshi mutaxassislarni toping'}
+                  </p>
+                  <div className="mt-auto pt-4 border-t border-dark-700 w-full group-hover:border-primary/20 transition-colors">
+                    <span className="text-primary text-sm font-medium inline-flex items-center group-hover:gap-2 transition-all">
+                      {lang === 'ru' ? 'Смотреть услуги' : 'Xizmatlarni ko\'rish'}
+                      <ArrowRight className="ml-1 w-4 h-4" />
+                    </span>
+                  </div>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>

@@ -22,12 +22,15 @@ export default async function Navbar({ lang }: { lang: Locale }) {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors cursor-pointer group px-3 py-1.5 rounded-md hover:bg-dark-800">
-            <Globe className="w-4 h-4" />
-            <Link href={lang === 'ru' ? '/uz' : '/ru'} className="text-sm font-medium uppercase">
+          <Link 
+            href={lang === 'ru' ? '/uz' : '/ru'} 
+            className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group px-3 py-1.5 rounded-md hover:bg-dark-800"
+          >
+            <Globe className="w-4 h-4 group-hover:rotate-12 transition-transform" />
+            <span className="text-sm font-medium uppercase">
               {lang === 'ru' ? 'UZ' : 'RU'}
-            </Link>
-          </div>
+            </span>
+          </Link>
           <Link href={`/${lang}/login`}>
             <Button variant="ghost" className="hidden sm:inline-flex">
               {dictionary.common.login}
