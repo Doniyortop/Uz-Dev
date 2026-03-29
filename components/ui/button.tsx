@@ -9,7 +9,7 @@ export interface ButtonProps
   href?: string
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonProps>(
   ({ className, variant = 'primary', size = 'md', href, ...props }, ref) => {
     const variants = {
       primary: 'bg-primary hover:bg-primary-dark text-white shadow-lg shadow-primary/20',
@@ -33,7 +33,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     if (href) {
       return (
-        <Link href={href} className={classes}>
+        <Link 
+          href={href} 
+          className={classes}
+          {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
+        >
           {props.children}
         </Link>
       )
@@ -41,7 +45,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <button
-        ref={ref}
+        ref={ref as React.Ref<HTMLButtonElement>}
         className={classes}
         {...props}
       />
