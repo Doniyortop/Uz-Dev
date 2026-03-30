@@ -6,6 +6,8 @@ import { Github, Twitter, Send } from 'lucide-react';
 export default async function Footer({ lang }: { lang: Locale }) {
   const dictionary = await getDictionary(lang);
 
+  if (!dictionary) return null;
+
   return (
     <footer className="border-t border-dark-700 bg-dark-900 pt-16 pb-8">
       <div className="container mx-auto px-4">

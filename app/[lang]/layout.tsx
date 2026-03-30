@@ -5,15 +5,19 @@ import Footer from '@/components/shared/footer';
 import { Locale } from '@/types';
 import { getDictionary } from '@/lib/i18n/get-dictionary';
 
-const inter = Inter({ subsets: ['latin', 'cyrillic'] });
+const inter = Inter({ subsets: ['latin'] });
 
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
-  const dictionary = await getDictionary(lang as Locale);
+  const dictionary = await getDictionary(lang);
+  
+  const title = lang === 'ru' 
+    ? 'UzDev Hub - IT-маркетплейс Узбекистана' 
+    : 'UzDev Hub - O\'zbekiston IT-marketpleysi';
   
   return {
-    title: `UzDev Hub - ${lang === 'ru' ? 'IT-маркетплейс Узбекистана' : 'O\'zbekiston IT-marketpleysi'}`,
-    description: dictionary.hero.subtitle,
+    title,
+    description: dictionary?.hero?.subtitle || '',
   };
 }
 
@@ -25,12 +29,14 @@ export default async function RootLayout({
   params: Promise<{ lang: string }>;
 }) {
   const { lang } = await params;
+  const validLocale = (lang === 'ru' || lang === 'uz') ? lang : 'ru';
+
   return (
-    <html lang={lang}>
+    <html lang={validLocale}>
       <body className={`${inter.className} min-h-screen bg-dark-900 text-foreground flex flex-col`}>
-        <Navbar lang={lang as Locale} />
+        <Navbar lang={validLocale as Locale} />
         <main className="flex-grow">{children}</main>
-        <Footer lang={lang as Locale} />
+        <Footer lang={validLocale as Locale} />
       </body>
     </html>
   );
