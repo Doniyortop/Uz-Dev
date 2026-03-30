@@ -18,6 +18,8 @@ export default function DashboardPage({
   const router = useRouter();
   const [role, setRole] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('overview');
+  const [isEditing, setIsEditing] = useState(false);
+  const [isConfiguring, setIsConfiguring] = useState(false);
 
   useEffect(() => {
     const savedRole = localStorage.getItem('user_role');
@@ -132,11 +134,20 @@ export default function DashboardPage({
                 <h3 className="text-xl font-bold text-white mb-2">
                   {lang === 'ru' ? 'Здесь пока пусто' : 'Bu yerda hali bo\'sh'}
                 </h3>
-                <p className="text-slate-400 max-w-sm">
+                <p className="text-slate-400 max-w-sm mb-6">
                   {lang === 'ru' 
                     ? 'У вас еще нет активных заказов или услуг. Начните работу прямо сейчас!' 
                     : 'Sizda hali faol buyurtmalar yoki xizmatlar yo\'q. Ishni hoziroq boshlang!'}
                 </p>
+                <Button 
+                  key={`overview-${role}`}
+                  onClick={() => router.push(`/${lang}/services`)}
+                  className="px-8"
+                >
+                  {role === 'freelancer' 
+                    ? (lang === 'ru' ? 'Добавить услугу' : 'Xizmat qo\'shish')
+                    : (lang === 'ru' ? 'Найти исполнителя' : 'Ijrochi topish')}
+                </Button>
               </Card>
             </div>
           )}
@@ -153,7 +164,11 @@ export default function DashboardPage({
                 <p className="text-slate-400">
                   {lang === 'ru' ? 'Список пуст' : 'Ro\'yxat bo\'sh'}
                 </p>
-                <Button className="mt-6">
+                <Button 
+                  key={role}
+                  onClick={() => router.push(`/${lang}/services`)}
+                  className="mt-6"
+                >
                   {role === 'freelancer' 
                     ? (lang === 'ru' ? 'Добавить услугу' : 'Xizmat qo\'shish')
                     : (lang === 'ru' ? 'Найти исполнителя' : 'Ijrochi topish')}
@@ -164,50 +179,159 @@ export default function DashboardPage({
 
           {activeTab === 'settings' && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <h1 className="text-3xl font-bold text-white">
-                {lang === 'ru' ? 'Настройки профиля' : 'Profil sozlamalari'}
-              </h1>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <Card className="p-6 space-y-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                      <User className="w-8 h-8 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-white text-lg">{lang === 'ru' ? 'Личные данные' : 'Shaxsiy ma\'lumotlar'}</h3>
-                      <p className="text-slate-400 text-sm">{lang === 'ru' ? 'Измените ваше имя и био' : 'Ismingiz va bioni o\'zgartiring'}</p>
-                    </div>
-                  </div>
-                  <Button variant="outline" className="w-full">{lang === 'ru' ? 'Редактировать' : 'Tahrirlash'}</Button>
-                </Card>
-
-                <Card className="p-6 space-y-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center">
-                      <Bell className="w-8 h-8 text-blue-500" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-white text-lg">{lang === 'ru' ? 'Уведомления' : 'Bildirishnomalar'}</h3>
-                      <p className="text-slate-400 text-sm">{lang === 'ru' ? 'Настройте оповещения' : 'Bildirishnomalarni sozlang'}</p>
-                    </div>
-                  </div>
-                  <Button variant="outline" className="w-full">{lang === 'ru' ? 'Настроить' : 'Sozlash'}</Button>
-                </Card>
-
-                <Card className="p-6 space-y-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center">
-                      <CreditCard className="w-8 h-8 text-emerald-500" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-white text-lg">{lang === 'ru' ? 'Выплаты' : 'To\'lovlar'}</h3>
-                      <p className="text-slate-400 text-sm">{lang === 'ru' ? 'Кошелек и история' : 'Hamyon va tarix'}</p>
-                    </div>
-                  </div>
-                  <Button variant="outline" className="w-full">{lang === 'ru' ? 'Управление' : 'Boshqarish'}</Button>
-                </Card>
+              <div className="flex justify-between items-center">
+                <h1 className="text-3xl font-bold text-white">
+                  {lang === 'ru' ? 'Настройки профиля' : 'Profil sozlamalari'}
+                </h1>
+                {(isEditing || isConfiguring) && (
+                  <Button variant="ghost" onClick={() => { setIsEditing(false); setIsConfiguring(false); }}>
+                    {lang === 'ru' ? 'Назад' : 'Orqaga'}
+                  </Button>
+                )}
               </div>
+              
+              {!isEditing && !isConfiguring ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <Card className="p-6 space-y-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                        <User className="w-8 h-8 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-white text-lg">{lang === 'ru' ? 'Личные данные' : 'Shaxsiy ma\'lumotlar'}</h3>
+                        <p className="text-slate-400 text-sm">{lang === 'ru' ? 'Измените ваше имя и био' : 'Ismingiz va bioni o\'zgartiring'}</p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => setIsEditing(true)}
+                    >
+                      {lang === 'ru' ? 'Редактировать' : 'Tahrirlash'}
+                    </Button>
+                  </Card>
+
+                  <Card className="p-6 space-y-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center">
+                        <Bell className="w-8 h-8 text-blue-500" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-white text-lg">{lang === 'ru' ? 'Уведомления' : 'Bildirishnomalar'}</h3>
+                        <p className="text-slate-400 text-sm">{lang === 'ru' ? 'Настройте оповещения' : 'Bildirishnomalarni sozlang'}</p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => setIsConfiguring(true)}
+                    >
+                      {lang === 'ru' ? 'Настроить' : 'Sozlash'}
+                    </Button>
+                  </Card>
+
+                  <Card className="p-6 space-y-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                        <CreditCard className="w-8 h-8 text-emerald-500" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-white text-lg">{lang === 'ru' ? 'Выплаты' : 'To\'lovlar'}</h3>
+                        <p className="text-slate-400 text-sm">{lang === 'ru' ? 'Кошелек и история' : 'Hamyon va tarix'}</p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      className="w-full"
+                      onClick={() => alert(lang === 'ru' ? 'Управление выплатами будет доступно в следующей версии!' : 'To\'lovlarni boshqarish keyingi versiyada mavjud bo\'ladi!')}
+                    >
+                      {lang === 'ru' ? 'Управление' : 'Boshqarish'}
+                    </Button>
+                  </Card>
+                </div>
+              ) : isEditing ? (
+                <Card className="p-8 max-w-2xl border-dark-700 bg-dark-800">
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-400">
+                        {lang === 'ru' ? 'Полное имя' : 'To\'liq ism'}
+                      </label>
+                      <input 
+                        type="text" 
+                        defaultValue="User Name"
+                        className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-primary"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-400">
+                        {lang === 'ru' ? 'О себе' : 'Men haqimda'}
+                      </label>
+                      <textarea 
+                        rows={4}
+                        defaultValue="Senior Developer from Tashkent"
+                        className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-primary resize-none"
+                      />
+                    </div>
+                    <div className="flex gap-4 pt-4">
+                      <Button 
+                        className="flex-grow"
+                        onClick={() => {
+                          alert(lang === 'ru' ? 'Изменения сохранены!' : 'O\'zgarishlar saqlandi!');
+                          setIsEditing(false);
+                        }}
+                      >
+                        {lang === 'ru' ? 'Сохранить' : 'Saqlash'}
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        onClick={() => setIsEditing(false)}
+                      >
+                        {lang === 'ru' ? 'Отмена' : 'Bekor qilish'}
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              ) : (
+                <Card className="p-8 max-w-2xl border-dark-700 bg-dark-800">
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between p-4 bg-dark-700 rounded-xl">
+                      <div>
+                        <h4 className="text-white font-bold">{lang === 'ru' ? 'Email уведомления' : 'Email bildirishnomalar'}</h4>
+                        <p className="text-slate-400 text-sm">{lang === 'ru' ? 'Получать письма о заказах' : 'Buyurtmalar haqida xat olish'}</p>
+                      </div>
+                      <div className="w-12 h-6 bg-primary rounded-full relative cursor-pointer">
+                        <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full" />
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between p-4 bg-dark-700 rounded-xl">
+                      <div>
+                        <h4 className="text-white font-bold">{lang === 'ru' ? 'Telegram бот' : 'Telegram bot'}</h4>
+                        <p className="text-slate-400 text-sm">{lang === 'ru' ? 'Уведомления в мессенджер' : 'Messenjerga bildirishnomalar'}</p>
+                      </div>
+                      <div className="w-12 h-6 bg-dark-600 rounded-full relative cursor-pointer">
+                        <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full" />
+                      </div>
+                    </div>
+                    <div className="flex gap-4 pt-4">
+                      <Button 
+                        className="flex-grow"
+                        onClick={() => {
+                          alert(lang === 'ru' ? 'Настройки уведомлений сохранены!' : 'Bildirishnoma sozlamalari saqlandi!');
+                          setIsConfiguring(false);
+                        }}
+                      >
+                        {lang === 'ru' ? 'Сохранить' : 'Saqlash'}
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        onClick={() => setIsConfiguring(false)}
+                      >
+                        {lang === 'ru' ? 'Назад' : 'Orqaga'}
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              )}
             </div>
           )}
         </main>

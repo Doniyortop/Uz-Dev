@@ -36,7 +36,11 @@ const Button = React.forwardRef<HTMLButtonElement | HTMLAnchorElement, ButtonPro
         <Link 
           href={href} 
           className={classes}
-          {...(props as React.AnchorHTMLAttributes<HTMLAnchorElement>)}
+          onClick={(e) => {
+            if (props.onClick) {
+              props.onClick(e as any);
+            }
+          }}
         >
           {props.children}
         </Link>

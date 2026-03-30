@@ -106,7 +106,7 @@ export default function Navbar({ lang }: { lang: Locale }) {
                       {lang === 'ru' ? 'Дашборд' : 'Boshqaruv paneli'}
                     </Link>
                     <Link 
-                      href={`/${lang}/dashboard`}
+                      href={`/${lang}/freelancers/doniyor`}
                       onClick={() => setIsMenuOpen(false)}
                       className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-dark-700 rounded-lg transition-colors"
                     >
