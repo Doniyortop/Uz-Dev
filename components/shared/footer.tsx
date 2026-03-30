@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Locale } from '@/types';
+import { Locale, Dictionary } from '@/types';
 import { getDictionary } from '@/lib/i18n/get-dictionary';
 import { Github, Twitter, Send } from 'lucide-react';
 
@@ -35,7 +35,7 @@ export default async function Footer({ lang }: { lang: Locale }) {
           <div>
             <h4 className="text-white font-bold mb-6">{dictionary.common.categories}</h4>
             <ul className="space-y-4">
-              {Object.entries(dictionary.categories).map(([key, value]) => (
+              {Object.entries(dictionary.categories).map(([key, value]: [string, string]) => (
                 <li key={key}>
                   <Link href={`/${lang}/services?category=${key}`} className="text-slate-400 hover:text-primary text-sm transition-colors">
                     {value}

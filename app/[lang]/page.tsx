@@ -1,5 +1,5 @@
 import { getDictionary } from '@/lib/i18n/get-dictionary';
-import { Locale } from '@/types';
+import { Locale, Dictionary } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Bot, Code, Paintbrush, Gamepad2, ArrowRight } from 'lucide-react';
@@ -42,7 +42,7 @@ export default async function Home({
           
           <FadeIn delay={0.2}>
             <h1 className="text-5xl md:text-7xl font-bold mb-8 text-white leading-tight tracking-tight">
-              {dictionary.hero.title.split(' ').map((word, i) => (
+              {dictionary.hero.title.split(' ').map((word: string, i: number) => (
                 <span key={i} className={word.toLowerCase().includes('it') ? 'text-primary' : ''}>
                   {word}{' '}
                 </span>

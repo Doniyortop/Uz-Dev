@@ -2,14 +2,14 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { Locale } from '@/types';
+import { Locale, Dictionary } from '@/types';
 import { getDictionary } from '@/lib/i18n/get-dictionary';
 import { Button } from '@/components/ui/button';
 import { Globe, User, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react';
 
 export default function Navbar({ lang }: { lang: Locale }) {
   const [isAuth, setIsAuth] = useState(false);
-  const [dictionary, setDictionary] = useState<any>(null);
+  const [dictionary, setDictionary] = useState<Dictionary | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 

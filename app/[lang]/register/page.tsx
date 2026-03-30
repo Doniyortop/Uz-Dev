@@ -3,7 +3,7 @@
 import { useState, use, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getDictionary } from '@/lib/i18n/get-dictionary';
-import { Locale } from '@/types';
+import { Locale, Dictionary } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
@@ -16,7 +16,7 @@ export default function RegisterPage({
   const { lang } = use(params);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [dictionary, setDictionary] = useState<any>(null);
+  const [dictionary, setDictionary] = useState<Dictionary | null>(null);
 
   // Load dictionary on client
   useEffect(() => {

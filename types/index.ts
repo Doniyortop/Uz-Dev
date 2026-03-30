@@ -31,3 +31,19 @@ export interface Service {
   tags: string[];
   is_active: boolean;
 }
+
+export interface Dictionary {
+  common: {
+    contact_tg: string;
+    categories: string;
+    search: string;
+    login: string;
+    register: string;
+  };
+  hero: {
+    title: string;
+    subtitle: string;
+    cta: string;
+  };
+  categories: Record<string, string>;
+}
