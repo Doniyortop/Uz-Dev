@@ -15,6 +15,32 @@
     "tg_bots": "Telegram botlar",
     "web_dev": "Saytlar yaratish",
     "design": "Dizayn",
-    "game_servers": "O'yin serverlari"
+    "game_servers": "O'yin serverlari",
+    "find_experts": "Eng yaxshi mutaxassislarni toping",
+    "view_services": "Xizmatlarni ko'rish"
+  },
+  "auth": {
+    "login_welcome": "UzDev Hub-ga xush kelibsiz",
+    "register_welcome": "UzDev Hub hamjamiyatining a'zosi bo'ling",
+    "email": "Email",
+    "password": "Parol",
+    "full_name": "Ism va familiya",
+    "no_account": "Hisobingiz yo'qmi?",
+    "has_account": "Hisobingiz bormi?",
+    "dashboard": "Boshqaruv paneli",
+    "my_profile": "Mening profilim",
+    "logout": "Chiqish",
+    "user_name": "Foydalanuvchi nomi"
+  },
+  "footer": {
+    "platform": "Platforma",
+    "support": "Yordam",
+    "all_services": "Barcha xizmatlar",
+    "freelancers": "Freelancerlar",
+    "about": "Biz haqimizda",
+    "help": "Yordam markazi",
+    "rules": "Qoidalar",
+    "privacy": "Maxfiylik siyosati",
+    "all_rights": "Barcha huquqlar himoyalangan"
   }
 }

@@ -95,11 +95,11 @@ export default async function Home({
                       {dictionary.categories[key as keyof typeof dictionary.categories]}
                     </h3>
                     <p className="text-slate-400 text-sm mb-6">
-                      {lang === 'ru' ? 'Найти лучших экспертов' : 'Eng yaxshi mutaxassislarni toping'}
+                      {dictionary.categories.find_experts}
                     </p>
                     <div className="mt-auto pt-4 border-t border-dark-700 w-full group-hover:border-primary/20 transition-colors">
                       <span className="text-primary text-sm font-medium inline-flex items-center group-hover:gap-2 transition-all">
-                        {lang === 'ru' ? 'Смотреть услуги' : 'Xizmatlarni ko\'rish'}
+                        {dictionary.categories.view_services}
                         <ArrowRight className="ml-1 w-4 h-4" />
                       </span>
                     </div>

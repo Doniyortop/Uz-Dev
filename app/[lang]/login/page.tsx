@@ -51,14 +51,14 @@ export default function LoginPage({
             {dictionary.common.login}
           </CardTitle>
           <p className="text-slate-400">
-            {lang === 'ru' ? 'С возвращением в UzDev Hub' : 'UzDev Hub-ga xush kelibsiz'}
+            {dictionary.auth.login_welcome}
           </p>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">Email</label>
+                <label className="text-sm font-medium text-slate-300">{dictionary.auth.email}</label>
                 <input 
                   required
                   type="email" 
@@ -68,7 +68,7 @@ export default function LoginPage({
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-300">
-                  {lang === 'ru' ? 'Пароль' : 'Parol'}
+                  {dictionary.auth.password}
                 </label>
                 <input 
                   required
@@ -86,7 +86,7 @@ export default function LoginPage({
               )}
             </Button>
             <div className="text-center text-sm text-slate-400">
-              {lang === 'ru' ? 'Нет аккаунта?' : 'Hisobingiz yo\'qmi?'} {' '}
+              {dictionary.auth.no_account} {' '}
               <Link href={`/${lang}/register`} className="text-primary hover:underline font-medium">
                 {dictionary.common.register}
               </Link>

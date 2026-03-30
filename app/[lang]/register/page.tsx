@@ -45,7 +45,7 @@ export default function RegisterPage({
             {dictionary.common.register}
           </CardTitle>
           <p className="text-slate-400">
-            {lang === 'ru' ? 'Станьте частью сообщества UzDev Hub' : 'UzDev Hub hamjamiyatining a\'zosi bo\'ling'}
+            {dictionary.auth.register_welcome}
           </p>
         </CardHeader>
         <CardContent>
@@ -53,7 +53,7 @@ export default function RegisterPage({
             <div className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-300">
-                  {lang === 'ru' ? 'Имя и фамилия' : 'Ism va familiya'}
+                  {dictionary.auth.full_name}
                 </label>
                 <input 
                   required
@@ -63,7 +63,7 @@ export default function RegisterPage({
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">Email</label>
+                <label className="text-sm font-medium text-slate-300">{dictionary.auth.email}</label>
                 <input 
                   required
                   type="email" 
@@ -73,7 +73,7 @@ export default function RegisterPage({
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-300">
-                  {lang === 'ru' ? 'Пароль' : 'Parol'}
+                  {dictionary.auth.password}
                 </label>
                 <input 
                   required
@@ -91,7 +91,7 @@ export default function RegisterPage({
               )}
             </Button>
             <div className="text-center text-sm text-slate-400">
-              {lang === 'ru' ? 'Уже есть аккаунт?' : 'Hisobingiz bormi?'} {' '}
+              {dictionary.auth.has_account} {' '}
               <Link href={`/${lang}/login`} className="text-primary hover:underline font-medium">
                 {dictionary.common.login}
               </Link>

@@ -46,4 +46,28 @@ export interface Dictionary {
     cta: string;
   };
   categories: Record<string, string>;
+  auth: {
+    login_welcome: string;
+    register_welcome: string;
+    email: string;
+    password: string;
+    full_name: string;
+    no_account: string;
+    has_account: string;
+    dashboard: string;
+    my_profile: string;
+    logout: string;
+    user_name: string;
+  };
+  footer: {
+    platform: string;
+    support: string;
+    all_services: string;
+    freelancers: string;
+    about: string;
+    help: string;
+    rules: string;
+    privacy: string;
+    all_rights: string;
+  };
 }

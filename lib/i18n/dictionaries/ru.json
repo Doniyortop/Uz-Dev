@@ -15,6 +15,32 @@
     "tg_bots": "Telegram-боты",
     "web_dev": "Разработка сайтов",
     "design": "Дизайн",
-    "game_servers": "Игровые серверы"
+    "game_servers": "Игровые серверы",
+    "find_experts": "Найти лучших экспертов",
+    "view_services": "Смотреть услуги"
+  },
+  "auth": {
+    "login_welcome": "С возвращением в UzDev Hub",
+    "register_welcome": "Станьте частью сообщества UzDev Hub",
+    "email": "Email",
+    "password": "Пароль",
+    "full_name": "Имя и фамилия",
+    "no_account": "Нет аккаунта?",
+    "has_account": "Уже есть аккаунт?",
+    "dashboard": "Дашборд",
+    "my_profile": "Мой профиль",
+    "logout": "Выход",
+    "user_name": "Имя пользователя"
+  },
+  "footer": {
+    "platform": "Платформа",
+    "support": "Поддержка",
+    "all_services": "Все услуги",
+    "freelancers": "Фрилансеры",
+    "about": "О нас",
+    "help": "Помощь",
+    "rules": "Правила",
+    "privacy": "Конфиденциальность",
+    "all_rights": "Все права защищены"
   }
 }
