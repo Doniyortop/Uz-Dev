@@ -10,7 +10,9 @@ export default async function FreelancerProfile({
 }: {
   params: Promise<{ lang: Locale; username: string }>;
 }) {
-  const { lang, username } = await params;
+  const resolvedParams = await params;
+  const lang = resolvedParams?.lang || 'ru';
+  const username = resolvedParams?.username;
   const dictionary = await getDictionary(lang);
 
   // Mock data for profile

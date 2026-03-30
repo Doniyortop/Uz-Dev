@@ -9,7 +9,8 @@ export default async function ServicesPage({
 }: {
   params: Promise<{ lang: Locale }>;
 }) {
-  const { lang } = await params;
+  const resolvedParams = await params;
+  const lang = resolvedParams?.lang || 'ru';
   const dictionary = await getDictionary(lang);
 
   // Mock data for services

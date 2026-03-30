@@ -11,7 +11,8 @@ export default async function Home({
 }: {
   params: Promise<{ lang: Locale }>;
 }) {
-  const { lang } = await params;
+  const resolvedParams = await params;
+  const lang = resolvedParams?.lang || 'ru';
   const dictionary = await getDictionary(lang);
 
   const categories = [

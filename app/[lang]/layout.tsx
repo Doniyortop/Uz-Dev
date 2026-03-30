@@ -7,6 +7,10 @@ import { getDictionary } from '@/lib/i18n/get-dictionary';
 
 const inter = Inter({ subsets: ['latin'] });
 
+export function generateStaticParams() {
+  return [{ lang: 'ru' }, { lang: 'uz' }];
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const { lang } = await params;
   const dictionary = await getDictionary(lang);
@@ -28,7 +32,8 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: Promise<{ lang: string }>;
 }) {
-  const { lang } = await params;
+  const resolvedParams = await params;
+  const lang = resolvedParams?.lang || 'ru';
   const validLocale = (lang === 'ru' || lang === 'uz') ? lang : 'ru';
 
   return (

@@ -11,7 +11,9 @@ export default async function ServicePage({
 }: {
   params: Promise<{ lang: Locale; id: string }>;
 }) {
-  const { lang, id } = await params;
+  const resolvedParams = await params;
+  const lang = resolvedParams?.lang || 'ru';
+  const id = resolvedParams?.id;
   const dictionary = await getDictionary(lang);
 
   // Mock data for a single service
