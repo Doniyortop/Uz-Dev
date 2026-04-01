@@ -113,7 +113,13 @@ export default function Navbar({ lang }: { lang: Locale }) {
                     </Link>
                     <Link 
                       href={`/${lang}/freelancers/doniyor`}
-                      onClick={() => setIsMenuOpen(false)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsMenuOpen(false);
+                        const savedName = localStorage.getItem('user_name') || 'User';
+                        const slug = savedName.toLowerCase().replace(/\s+/g, '-');
+                        router.push(`/${lang}/freelancers/${slug}`);
+                      }}
                       className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-dark-700 rounded-lg transition-colors"
                     >
                       <User className="w-4 h-4" />

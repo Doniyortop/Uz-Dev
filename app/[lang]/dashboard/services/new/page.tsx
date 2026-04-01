@@ -24,7 +24,8 @@ export default function NewServicePage({
     category: 'tg_bots',
     price: '',
     description: '',
-    tags: ''
+    tags: '',
+    telegram: ''
   });
 
   useEffect(() => {
@@ -53,9 +54,11 @@ export default function NewServicePage({
     setIsLoading(true);
     
     // Create new service object
+    const userName = localStorage.getItem('user_name') || 'Freelancer';
     const newService = {
       id: Math.random().toString(36).substr(2, 9),
       ...formData,
+      freelancer_name: userName,
       image: previewImage,
       createdAt: new Date().toISOString()
     };
@@ -176,6 +179,27 @@ export default function NewServicePage({
                 placeholder="Telegram, Node.js, API"
                 className="w-full bg-dark-700 border border-dark-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
               />
+            </div>
+
+            {/* Telegram Link */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-300">
+                {lang === 'ru' ? 'Telegram Username (без @)' : 'Telegram Username (@-siz)'}
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500">t.me/</span>
+                <input 
+                  required
+                  type="text" 
+                  value={formData.telegram}
+                  onChange={(e) => setFormData({ ...formData, telegram: e.target.value })}
+                  placeholder="username"
+                  className="w-full bg-dark-700 border border-dark-600 rounded-xl pl-14 pr-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
+                />
+              </div>
+              <p className="text-xs text-slate-500">
+                {lang === 'ru' ? 'Этот контакт будет использоваться для связи с вами' : 'Bu kontakt siz bilan bog\'lanish uchun ishlatiladi'}
+              </p>
             </div>
 
             {/* Image Placeholder */}

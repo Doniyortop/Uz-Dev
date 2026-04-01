@@ -1,27 +1,69 @@
+'use client';
+
 import { getDictionary } from '@/lib/i18n/get-dictionary';
-import { Locale } from '@/types';
+import { Locale, Service, Dictionary } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Star, Send, ExternalLink, ShieldCheck } from 'lucide-react';
+import { ServiceCard } from '@/components/shared/service-card';
+import { MessageCircle, Star, Send, ShieldCheck, Clock, RefreshCcw, ExternalLink } from 'lucide-react';
+import Link from 'next/link';
+import { use, useState, useEffect } from 'react';
 
-export default async function FreelancerProfile({
+export default function FreelancerProfile({
   params,
 }: {
   params: Promise<{ lang: Locale; username: string }>;
 }) {
-  const resolvedParams = await params;
-  const lang = resolvedParams?.lang || 'ru';
-  const username = resolvedParams?.username;
-  const dictionary = await getDictionary(lang);
+  const { lang, username } = use(params);
+  const [dictionary, setDictionary] = useState<Dictionary | null>(null);
+  const [profileData, setProfileName] = useState({
+    name: 'Freelancer Name',
+    bio: 'Senior Developer from Tashkent',
+    services: [] as any[]
+  });
+
+  useEffect(() => {
+    getDictionary(lang).then(setDictionary);
+
+    const savedName = localStorage.getItem('user_name') || 'Freelancer Name';
+    const savedBio = localStorage.getItem('user_bio') || 'Senior Developer from Tashkent';
+    const slug = savedName.toLowerCase().replace(/\s+/g, '-');
+    
+    // If viewing own profile
+    if (username === slug || username === 'doniyor') {
+      const userServices = JSON.parse(localStorage.getItem('user_services') || '[]');
+      const formattedServices = userServices.map((s: any) => ({
+        id: s.id,
+        freelancer_id: 'user',
+        category_id: s.category,
+        title_ru: s.title,
+        title_uz: s.title,
+        description_ru: s.description,
+        description_uz: s.description,
+        price: s.price,
+        tags: s.tags.split(',').map((t: string) => t.trim()),
+        is_active: true,
+        freelancer_name: savedName,
+        telegram: s.telegram,
+        image: s.image
+      }));
+
+      setProfileName({
+        name: savedName,
+        bio: savedBio,
+        services: formattedServices
+      });
+    }
+  }, [lang, username]);
+
+  if (!dictionary) return null;
 
   // Mock data for profile
   const profile = {
-    full_name: 'Doniyor Uzakov',
+    full_name: profileData.name,
     avatar_url: 'https://github.com/shadcn.png',
-    bio: lang === 'ru' 
-      ? 'Senior Fullstack Developer. Специализируюсь на React, Next.js и Telegram ботах.' 
-      : 'Senior Fullstack Developer. React, Next.js va Telegram botlar bo\'yicha mutaxassisman.',
+    bio: profileData.bio,
     telegram_username: 'uzdev_hub',
     rating: 4.9,
     completed_orders: 124,
@@ -35,8 +77,8 @@ export default async function FreelancerProfile({
         <div className="lg:col-span-1">
           <Card className="sticky top-24">
             <CardHeader className="flex flex-col items-center pb-2">
-              <div className="w-32 h-32 rounded-full overflow-hidden mb-6 border-4 border-primary/20 p-1 relative">
-                <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full rounded-full object-cover" />
+              <div className="w-32 h-32 rounded-full overflow-hidden mb-6 border-4 border-primary/20 p-1 relative bg-dark-700 flex items-center justify-center text-4xl font-bold text-white">
+                {profile.full_name.charAt(0).toUpperCase()}
                 <div className="absolute bottom-1 right-1 bg-white rounded-full p-1.5 shadow-lg border-2 border-primary/20">
                   <ShieldCheck className="w-6 h-6 text-primary" />
                 </div>
@@ -98,18 +140,20 @@ export default async function FreelancerProfile({
           <div className="flex flex-col gap-6 pt-8">
             <h2 className="text-3xl font-bold text-white flex items-center gap-3">
               <div className="w-2 h-8 bg-primary rounded-full" />
-              {lang === 'ru' ? 'Мои услуги' : 'Mening xizmatlarim'}
+              {lang === 'ru' ? 'Услуги' : 'Xizmatlar'}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Service Cards will go here */}
-              <Card className="p-6 border-dashed border-2 border-dark-700 hover:border-primary/50 flex flex-col items-center justify-center text-center group cursor-pointer h-48">
-                <div className="w-12 h-12 rounded-full bg-dark-800 flex items-center justify-center mb-4 group-hover:bg-primary/10 transition-colors">
-                   <div className="w-6 h-6 bg-primary rounded-full opacity-50" />
-                </div>
-                <p className="text-slate-400 font-medium">
-                  {lang === 'ru' ? 'Все услуги этого фрилансера' : 'Freelancerning barcha xizmatlari'}
-                </p>
-              </Card>
+              {profileData.services.length > 0 ? (
+                profileData.services.map((service) => (
+                  <ServiceCard key={service.id} service={service} lang={lang} />
+                ))
+              ) : (
+                <Card className="p-6 border-dashed border-2 border-dark-700 flex flex-col items-center justify-center text-center h-48">
+                  <p className="text-slate-400">
+                    {lang === 'ru' ? 'У этого фрилансера пока нет активных услуг' : 'Ushbu frilanserda hali faol xizmatlar yo\'q'}
+                  </p>
+                </Card>
+              )}
             </div>
           </div>
         </div>
