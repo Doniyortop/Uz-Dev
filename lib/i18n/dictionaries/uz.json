@@ -16,5 +16,16 @@
     "web_dev": "Saytlar yaratish",
     "design": "Dizayn",
     "game_servers": "O'yin serverlari"
+  },
+  "footer": {
+    "about": "Biz haqimizda",
+    "platform": "Platforma",
+    "all_services": "Barcha xizmatlar",
+    "freelancers": "Freelancerlar",
+    "support": "Yordam",
+    "help": "Yordam markazi",
+    "rules": "Qoidalar",
+    "privacy": "Maxfiylik siyosati",
+    "rights": "Barcha huquqlar himoyalangan"
   }
 }

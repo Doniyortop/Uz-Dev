@@ -46,4 +46,15 @@ export interface Dictionary {
     cta: string;
   };
   categories: Record<string, string>;
+  footer: {
+    about: string;
+    platform: string;
+    all_services: string;
+    freelancers: string;
+    support: string;
+    help: string;
+    rules: string;
+    privacy: string;
+    rights: string;
+  };
 }

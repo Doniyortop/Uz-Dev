@@ -46,27 +46,27 @@ export default async function Footer({ lang }: { lang: Locale }) {
           </div>
 
           <div>
-            <h4 className="text-white font-bold mb-6">{lang === 'ru' ? 'Платформа' : 'Platforma'}</h4>
+            <h4 className="text-white font-bold mb-6">{dictionary.footer.platform}</h4>
             <ul className="space-y-4 text-sm text-slate-400">
-              <li><Link href={`/${lang}/services`} className="hover:text-primary transition-colors">{lang === 'ru' ? 'Все услуги' : 'Barcha xizmatlar'}</Link></li>
-              <li><Link href={`/${lang}/freelancers`} className="hover:text-primary transition-colors">{lang === 'ru' ? 'Фрилансеры' : 'Freelancerlar'}</Link></li>
-              <li><Link href="#" className="hover:text-primary transition-colors">{lang === 'ru' ? 'О нас' : 'Biz haqimizda'}</Link></li>
+              <li><Link href={`/${lang}/services`} className="hover:text-primary transition-colors">{dictionary.footer.all_services}</Link></li>
+              <li><Link href={`/${lang}/freelancers`} className="hover:text-primary transition-colors">{dictionary.footer.freelancers}</Link></li>
+              <li><Link href={`/${lang}/about`} className="hover:text-primary transition-colors">{dictionary.footer.about}</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-white font-bold mb-6">{lang === 'ru' ? 'Поддержка' : 'Yordam'}</h4>
+            <h4 className="text-white font-bold mb-6">{dictionary.footer.support}</h4>
             <ul className="space-y-4 text-sm text-slate-400">
-              <li><Link href="#" className="hover:text-primary transition-colors">{lang === 'ru' ? 'Помощь' : 'Yordam markazi'}</Link></li>
-              <li><Link href="#" className="hover:text-primary transition-colors">{lang === 'ru' ? 'Правила' : 'Qoidalar'}</Link></li>
-              <li><Link href="#" className="hover:text-primary transition-colors">{lang === 'ru' ? 'Конфиденциальность' : 'Maxfiylik siyosati'}</Link></li>
+              <li><Link href={`/${lang}/help`} className="hover:text-primary transition-colors">{dictionary.footer.help}</Link></li>
+              <li><Link href={`/${lang}/rules`} className="hover:text-primary transition-colors">{dictionary.footer.rules}</Link></li>
+              <li><Link href={`/${lang}/privacy`} className="hover:text-primary transition-colors">{dictionary.footer.privacy}</Link></li>
             </ul>
           </div>
         </div>
 
         <div className="border-t border-dark-700 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-slate-500 text-xs">
-            © {new Date().getFullYear()} UzDev Hub. {lang === 'ru' ? 'Все права защищены' : 'Barcha huquqlar himoyalangan'}.
+            © {new Date().getFullYear()} UzDev Hub. {dictionary.footer.rights}.
           </p>
           <div className="flex gap-6 text-xs text-slate-500">
             <span>Made with ❤️ in Uzbekistan</span>
