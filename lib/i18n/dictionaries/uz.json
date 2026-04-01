@@ -4,7 +4,10 @@
     "categories": "Kategoriyalar",
     "search": "Qidiruv",
     "login": "Kirish",
-    "register": "Ro'yxatdan o'tish"
+    "register": "Ro'yxatdan o'tish",
+    "back": "Orqaga",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish"
   },
   "hero": {
     "title": "O'zbekistonning eng yaxshi IT mutaxassislarini toping",

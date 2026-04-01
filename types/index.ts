@@ -39,6 +39,9 @@ export interface Dictionary {
     search: string;
     login: string;
     register: string;
+    back: string;
+    save: string;
+    cancel: string;
   };
   hero: {
     title: string;
