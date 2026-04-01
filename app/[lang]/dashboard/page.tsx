@@ -372,7 +372,8 @@ export default function DashboardPage({
                         localStorage.setItem('user_role', newRole);
                         setRole(newRole);
                         window.dispatchEvent(new Event('auth-change'));
-                        alert(lang === 'ru' ? 'Роль успешно изменена!' : 'Rol muvaffaqiyatli o\'zgartirildi!');
+                        // Refresh to sync role properly
+                        window.location.reload();
                       }}
                     >
                       {lang === 'ru' ? 'Переключить роль' : 'Rolni almashtirish'}

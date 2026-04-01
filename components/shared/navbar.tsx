@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { Locale, Dictionary } from '@/types';
 import { getDictionary } from '@/lib/i18n/get-dictionary';
 import { Button } from '@/components/ui/button';
@@ -13,6 +14,8 @@ export default function Navbar({ lang }: { lang: Locale }) {
   const [dictionary, setDictionary] = useState<Dictionary | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     // Initial check
@@ -42,6 +45,15 @@ export default function Navbar({ lang }: { lang: Locale }) {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [lang]);
+
+  const handleLanguageSwitch = (newLocale: string) => {
+    // Current pathname example: /ru/services
+    // We want to change /ru to /uz while keeping /services
+    const segments = pathname.split('/');
+    segments[1] = newLocale;
+    const newPath = segments.join('/');
+    router.push(newPath);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('is_auth');
@@ -74,15 +86,15 @@ export default function Navbar({ lang }: { lang: Locale }) {
 
         <div className="flex items-center gap-4">
           {/* Language Switcher */}
-          <Link 
-            href={lang === 'ru' ? '/uz' : '/ru'} 
+          <button 
+            onClick={() => handleLanguageSwitch(lang === 'ru' ? 'uz' : 'ru')}
             className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group px-3 py-1.5 rounded-md hover:bg-dark-800"
           >
             <Globe className="w-4 h-4 group-hover:rotate-12 transition-transform" />
             <span className="text-sm font-medium uppercase">
               {lang === 'ru' ? 'UZ' : 'RU'}
             </span>
-          </Link>
+          </button>
 
           {isAuth ? (
             <div className="relative" ref={menuRef}>
