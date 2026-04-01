@@ -16,8 +16,8 @@ export function ServiceCard({ service, lang }: ServiceCardProps) {
   const router = useRouter();
   const title = lang === 'ru' ? service.title_ru : service.title_uz;
   const description = lang === 'ru' ? service.description_ru : service.description_uz;
-  const freelancerName = (service as any).freelancer_name || 'Freelancer';
-  const telegram = (service as any).telegram;
+  const freelancerName = service.freelancer_name || 'Freelancer';
+  const telegram = service.telegram;
 
   return (
     <Card 

@@ -30,6 +30,9 @@ export interface Service {
   price: number;
   tags: string[];
   is_active: boolean;
+  image?: string | null;
+  freelancer_name?: string;
+  telegram?: string;
 }
 
 export interface Dictionary {

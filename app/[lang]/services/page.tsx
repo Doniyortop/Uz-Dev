@@ -14,7 +14,7 @@ export default function ServicesPage({
 }) {
   const { lang } = use(params);
   const [dictionary, setDictionary] = useState<Dictionary | null>(null);
-  const [services, setServices] = useState<any[]>([]);
+  const [services, setServices] = useState<Service[]>([]);
 
   useEffect(() => {
     getDictionary(lang).then(setDictionary);

@@ -20,7 +20,7 @@ export default function FreelancerProfile({
   const [profileData, setProfileName] = useState({
     name: 'Freelancer Name',
     bio: 'Senior Developer from Tashkent',
-    services: [] as any[]
+    services: [] as Service[]
   });
 
   useEffect(() => {
