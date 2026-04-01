@@ -2,51 +2,30 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { Locale, Dictionary } from '@/types';
 import { getDictionary } from '@/lib/i18n/get-dictionary';
 import { Button } from '@/components/ui/button';
 import { Globe, User, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react';
-import { getSession, signOut, getUser } from '@/lib/supabase/auth';
-import { Session, User as SupabaseUser } from '@supabase/supabase-js';
 
 export default function Navbar({ lang }: { lang: Locale }) {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<SupabaseUser | null>(null);
+  const [isAuth, setIsAuth] = useState(false);
   const [dictionary, setDictionary] = useState<Dictionary | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const pathname = usePathname();
-
-  const getLangSwitchUrl = () => {
-    const newLang = lang === 'ru' ? 'uz' : 'ru';
-    if (!pathname) return `/${newLang}`;
-    const segments = pathname.split('/');
-    segments[1] = newLang;
-    return segments.join('/');
-  };
 
   useEffect(() => {
-    const fetchSessionAndUser = async () => {
-      const currentSession = await getSession();
-      setSession(currentSession);
-      if (currentSession) {
-        const currentUser = await getUser();
-        setUser(currentUser);
-      } else {
-        setUser(null);
-      }
+    // Initial check
+    const checkAuth = () => {
+      setIsAuth(localStorage.getItem('is_auth') === 'true');
     };
     
-    fetchSessionAndUser();
+    checkAuth();
     getDictionary(lang).then(setDictionary);
 
-    const handleAuthChange = () => {
-      fetchSessionAndUser();
-    };
-
-    window.addEventListener('auth-change', handleAuthChange);
+    // Listen for auth changes
+    window.addEventListener('auth-change', checkAuth);
     
+    // Close menu on click outside
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsMenuOpen(false);
@@ -56,28 +35,22 @@ export default function Navbar({ lang }: { lang: Locale }) {
     document.addEventListener('mousedown', handleClickOutside);
     
     return () => {
-      window.removeEventListener('auth-change', handleAuthChange);
+      window.removeEventListener('auth-change', checkAuth);
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [lang]);
 
-  const handleLogout = async () => {
-    try {
-      await signOut();
-      setSession(null);
-      setUser(null);
-      setIsMenuOpen(false);
-      // No need to dispatch custom event, Supabase handles it internally
-      window.location.href = `/${lang}`;
-    } catch (error) {
-      console.error('Error logging out:', error);
-    }
+  const handleLogout = () => {
+    localStorage.removeItem('is_auth');
+    localStorage.removeItem('user_role');
+    localStorage.removeItem('onboarded');
+    setIsAuth(false);
+    setIsMenuOpen(false);
+    window.dispatchEvent(new Event('auth-change'));
+    window.location.href = `/${lang}`;
   };
 
   if (!dictionary) return null;
-
-  const isAuthenticated = !!session;
-  const userName = user?.email || dictionary.auth.user_name;
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-dark-700 bg-dark-900/80 backdrop-blur-md">
@@ -96,7 +69,7 @@ export default function Navbar({ lang }: { lang: Locale }) {
         <div className="flex items-center gap-4">
           {/* Language Switcher */}
           <Link 
-            href={getLangSwitchUrl()} 
+            href={lang === 'ru' ? '/uz' : '/ru'} 
             className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors group px-3 py-1.5 rounded-md hover:bg-dark-800"
           >
             <Globe className="w-4 h-4 group-hover:rotate-12 transition-transform" />
@@ -105,7 +78,7 @@ export default function Navbar({ lang }: { lang: Locale }) {
             </span>
           </Link>
 
-          {isAuthenticated ? (
+          {isAuth ? (
             <div className="relative" ref={menuRef}>
               <button 
                 onClick={(e) => {
@@ -115,9 +88,9 @@ export default function Navbar({ lang }: { lang: Locale }) {
                 className="flex items-center gap-3 pl-3 pr-2 py-1.5 rounded-full bg-dark-800 border border-dark-700 hover:border-primary/50 transition-all group"
               >
                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm">
-                  {userName[0].toUpperCase()}
+                  U
                 </div>
-                <span className="text-sm font-medium text-white hidden sm:block">{userName}</span>
+                <span className="text-sm font-medium text-white hidden sm:block">User Name</span>
                 <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isMenuOpen ? 'rotate-180' : ''}`} />
               </button>
 
@@ -130,15 +103,15 @@ export default function Navbar({ lang }: { lang: Locale }) {
                       className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-dark-700 rounded-lg transition-colors"
                     >
                       <LayoutDashboard className="w-4 h-4" />
-                      {dictionary.auth.dashboard}
+                      {lang === 'ru' ? 'Дашборд' : 'Boshqaruv paneli'}
                     </Link>
                     <Link 
-                      href={`/${lang}/freelancers/${user?.id || 'doniyor'}`}
+                      href={`/${lang}/freelancers/doniyor`}
                       onClick={() => setIsMenuOpen(false)}
                       className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-dark-700 rounded-lg transition-colors"
                     >
                       <User className="w-4 h-4" />
-                      {dictionary.auth.my_profile}
+                      {lang === 'ru' ? 'Мой профиль' : 'Mening profilim'}
                     </Link>
                     <div className="h-px bg-dark-700 my-1 mx-2" />
                     <button 
@@ -146,7 +119,7 @@ export default function Navbar({ lang }: { lang: Locale }) {
                       className="w-full flex items-center gap-3 px-3 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition-colors"
                     >
                       <LogOut className="w-4 h-4" />
-                      {dictionary.auth.logout}
+                      {lang === 'ru' ? 'Выход' : 'Chiqish'}
                     </button>
                   </div>
                 </div>

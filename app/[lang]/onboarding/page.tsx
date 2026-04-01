@@ -1,14 +1,11 @@
 'use client';
 
-import { useState, use, useEffect } from 'react';
+import { useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { Locale, Dictionary } from '@/types';
+import { Locale } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Briefcase, Check } from 'lucide-react';
-import { getDictionary } from '@/lib/i18n/get-dictionary';
-import { getSession } from '@/lib/supabase/auth';
-import { updateUserProfile } from '@/lib/supabase/data';
 
 export default function OnboardingPage({
   params,
@@ -19,50 +16,29 @@ export default function OnboardingPage({
   const router = useRouter();
   const [role, setRole] = useState<'freelancer' | 'client' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [dictionary, setDictionary] = useState<Dictionary | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    getDictionary(lang).then(setDictionary);
-    const fetchUserSession = async () => {
-      const session = await getSession();
-      if (session) {
-        setUserId(session.user.id);
-      } else {
-        // If no session, redirect to login
-        router.push(`/${lang}/login`);
-      }
-    };
-    fetchUserSession();
-  }, [lang, router]);
-
-  const handleComplete = async () => {
-    if (!role || !userId) return;
+  const handleComplete = () => {
+    if (!role) return;
     setIsLoading(true);
-    setError(null);
-
-    try {
-      await updateUserProfile(userId, { role, onboarded: true });
+    // Simulate API call
+    setTimeout(() => {
+      localStorage.setItem('user_role', role);
+      localStorage.setItem('onboarded', 'true');
       router.push(`/${lang}/dashboard`);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setIsLoading(false);
-    }
+    }, 1500);
   };
-
-  if (!dictionary || !lang) return null;
 
   return (
     <div className="container mx-auto px-4 py-20 flex justify-center items-center">
       <Card className="w-full max-w-2xl p-8">
         <CardHeader className="text-center pb-8">
           <CardTitle className="text-3xl font-bold text-white mb-2">
-            {dictionary.onboarding.title}
+            {lang === 'ru' ? 'Завершение профиля' : 'Profilni yakunlash'}
           </CardTitle>
           <p className="text-slate-400">
-            {dictionary.onboarding.subtitle}
+            {lang === 'ru' 
+              ? 'Выберите вашу роль на платформе' 
+              : 'Platformadagi rolingizni tanlang'}
           </p>
         </CardHeader>
         <CardContent className="space-y-8">
@@ -81,10 +57,12 @@ export default function OnboardingPage({
                 <Briefcase className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold text-white mb-2">
-                {dictionary.onboarding.freelancer_title}
+                {lang === 'ru' ? 'Я Фрилансер' : 'Men Frilanserman'}
               </h3>
               <p className="text-slate-400 text-sm">
-                {dictionary.onboarding.freelancer_desc}
+                {lang === 'ru' 
+                  ? 'Хочу предлагать свои услуги и находить заказы' 
+                  : 'Xizmatlarimni taklif qilmoqchiman va buyurtmalar topmoqchiman'}
               </p>
             </button>
 
@@ -102,15 +80,16 @@ export default function OnboardingPage({
                 <User className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold text-white mb-2">
-                {dictionary.onboarding.client_title}
+                {lang === 'ru' ? 'Я Заказчик' : 'Men Mijozman'}
               </h3>
               <p className="text-slate-400 text-sm">
-                {dictionary.onboarding.client_desc}
+                {lang === 'ru' 
+                  ? 'Ищу профессионалов для реализации моих идей' 
+                  : 'G\'oyalarimni amalga oshirish uchun professionallarni qidiryapman'}
               </p>
             </button>
           </div>
 
-          {error && <p className="text-red-500 text-sm text-center mt-4">{error}</p>}
           <Button 
             onClick={handleComplete} 
             disabled={!role || isLoading} 
@@ -121,7 +100,7 @@ export default function OnboardingPage({
             ) : (
               <>
                 <Check className="w-5 h-5" />
-                {dictionary.onboarding.complete}
+                {lang === 'ru' ? 'Завершить' : 'Yakunlash'}
               </>
             )}
           </Button>
