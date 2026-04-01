@@ -9,6 +9,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { signInWithEmailAndPassword, getSession } from '@/lib/supabase/auth';
 
+export async function generateStaticParams() {
+  return [
+    { lang: 'ru' },
+    { lang: 'uz' }
+  ];
+}
+
 export default function LoginPage({
   params,
 }: {
