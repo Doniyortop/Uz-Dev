@@ -12,13 +12,6 @@ import { getProfile, updateUserProfile } from '@/lib/supabase/data';
 
 type Tab = 'overview' | 'items' | 'settings';
 
-export async function generateStaticParams() {
-  return [
-    { lang: 'ru' },
-    { lang: 'uz' }
-  ];
-}
-
 export default function DashboardPage({
   params,
 }: {

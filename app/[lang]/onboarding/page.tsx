@@ -10,13 +10,6 @@ import { getDictionary } from '@/lib/i18n/get-dictionary';
 import { getSession } from '@/lib/supabase/auth';
 import { updateUserProfile } from '@/lib/supabase/data';
 
-export async function generateStaticParams() {
-  return [
-    { lang: 'ru' },
-    { lang: 'uz' }
-  ];
-}
-
 export default function OnboardingPage({
   params,
 }: {
