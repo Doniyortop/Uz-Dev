@@ -17,6 +17,16 @@
     "design": "Dizayn",
     "game_servers": "O'yin serverlari"
   },
+  "dashboard": {
+    "add_service": "Xizmat qo'shish",
+    "edit_service": "Xizmatni tahrirlash",
+    "service_title": "Xizmat nomi",
+    "service_description": "Xizmat tavsifi",
+    "service_price": "Narxi (USD)",
+    "service_category": "Kategoriya",
+    "service_tags": "Teglar (vergul bilan)",
+    "create": "Xizmat yaratish"
+  },
   "footer": {
     "about": "Biz haqimizda",
     "platform": "Platforma",

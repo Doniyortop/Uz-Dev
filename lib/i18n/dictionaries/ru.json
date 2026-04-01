@@ -17,6 +17,16 @@
     "design": "Дизайн",
     "game_servers": "Игровые серверы"
   },
+  "dashboard": {
+    "add_service": "Добавить услугу",
+    "edit_service": "Редактировать услугу",
+    "service_title": "Название услуги",
+    "service_description": "Описание услуги",
+    "service_price": "Цена (USD)",
+    "service_category": "Категория",
+    "service_tags": "Теги (через запятую)",
+    "create": "Создать услугу"
+  },
   "footer": {
     "about": "О нас",
     "platform": "Платформа",

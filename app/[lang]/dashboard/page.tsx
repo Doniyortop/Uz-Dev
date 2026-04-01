@@ -141,7 +141,13 @@ export default function DashboardPage({
                 </p>
                 <Button 
                   key={`overview-${role}`}
-                  onClick={() => router.push(`/${lang}/services`)}
+                  onClick={() => {
+                    if (role === 'freelancer') {
+                      router.push(`/${lang}/dashboard/services/new`);
+                    } else {
+                      router.push(`/${lang}/services`);
+                    }
+                  }}
                   className="px-8"
                 >
                   {role === 'freelancer' 
@@ -166,7 +172,13 @@ export default function DashboardPage({
                 </p>
                 <Button 
                   key={role}
-                  onClick={() => router.push(`/${lang}/services`)}
+                  onClick={() => {
+                    if (role === 'freelancer') {
+                      router.push(`/${lang}/dashboard/services/new`);
+                    } else {
+                      router.push(`/${lang}/services`);
+                    }
+                  }}
                   className="mt-6"
                 >
                   {role === 'freelancer' 
