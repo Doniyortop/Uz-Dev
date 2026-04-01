@@ -2,10 +2,13 @@
 
 import { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { Locale } from '@/types';
+import { Locale, Dictionary } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LayoutDashboard, Settings, Package, LogOut, User, Bell, CreditCard } from 'lucide-react';
+import { getDictionary } from '@/lib/i18n/get-dictionary';
+import { getSession, signOut } from '@/lib/supabase/auth';
+import { getProfile, updateUserProfile } from '@/lib/supabase/data';
 
 type Tab = 'overview' | 'items' | 'settings';
 
@@ -16,26 +19,64 @@ export default function DashboardPage({
 }) {
   const { lang } = use(params);
   const router = useRouter();
-  const [role, setRole] = useState<string | null>(null);
+  const [dictionary, setDictionary] = useState<Dictionary | null>(null);
+  const [userRole, setUserRole] = useState<'freelancer' | 'client' | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>('overview');
-  const [isEditing, setIsEditing] = useState(false);
-  const [isConfiguring, setIsConfiguring] = useState(false);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [isConfiguringNotifications, setIsConfiguringNotifications] = useState(false);
+  const [fullName, setFullName] = useState('');
+  const [bio, setBio] = useState('');
+  const [profileError, setProfileError] = useState<string | null>(null);
 
   useEffect(() => {
-    const savedRole = localStorage.getItem('user_role');
-    if (!savedRole) {
-      router.push(`/${lang}/login`);
-    }
-    setRole(savedRole);
+    getDictionary(lang).then(setDictionary);
+
+    const fetchUserAndProfile = async () => {
+      const session = await getSession();
+      if (!session) {
+        router.push(`/${lang}/login`);
+        return;
+      }
+      setUserId(session.user.id);
+
+      const profile = await getProfile(session.user.id);
+      if (profile) {
+        setUserRole(profile.role || null);
+        setFullName(profile.full_name || '');
+        setBio(profile.bio || '');
+      } else {
+        // If no profile, user needs to go through onboarding
+        router.push(`/${lang}/onboarding`);
+      }
+    };
+    fetchUserAndProfile();
   }, [router, lang]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('is_auth');
-    localStorage.removeItem('user_role');
-    localStorage.removeItem('onboarded');
-    window.dispatchEvent(new Event('auth-change'));
-    router.push(`/${lang}`);
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      router.push(`/${lang}`);
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
   };
+
+  const handleSaveProfile = async () => {
+    if (!userId) return;
+    setProfileError(null);
+    try {
+      await updateUserProfile(userId, { full_name: fullName, bio: bio });
+      setIsEditingProfile(false);
+      if (dictionary) {
+        alert(dictionary.dashboard.changes_saved);
+      }
+    } catch (error: any) {
+      setProfileError(error.message);
+    }
+  };
+
+  if (!dictionary || !userRole) return null;
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -48,7 +89,7 @@ export default function DashboardPage({
             className={`w-full justify-start gap-3 py-6 ${activeTab !== 'overview' ? 'text-slate-400' : ''}`}
           >
             <LayoutDashboard className="w-5 h-5" />
-            {lang === 'ru' ? 'Дашборд' : 'Boshqaruv paneli'}
+            {dictionary.dashboard.overview}
           </Button>
           <Button 
             variant={activeTab === 'items' ? 'primary' : 'ghost'} 
@@ -56,9 +97,9 @@ export default function DashboardPage({
             className={`w-full justify-start gap-3 py-6 ${activeTab !== 'items' ? 'text-slate-400' : ''}`}
           >
             <Package className="w-5 h-5" />
-            {role === 'freelancer' 
-              ? (lang === 'ru' ? 'Мои услуги' : 'Mening xizmatlarim')
-              : (lang === 'ru' ? 'Мои заказы' : 'Mening buyurtmalarim')}
+            {userRole === 'freelancer' 
+              ? dictionary.dashboard.my_items
+              : dictionary.dashboard.my_orders}
           </Button>
           <Button 
             variant={activeTab === 'settings' ? 'primary' : 'ghost'} 
@@ -66,7 +107,7 @@ export default function DashboardPage({
             className={`w-full justify-start gap-3 py-6 ${activeTab !== 'settings' ? 'text-slate-400' : ''}`}
           >
             <Settings className="w-5 h-5" />
-            {lang === 'ru' ? 'Настройки' : 'Sozlamalar'}
+            {dictionary.dashboard.settings}
           </Button>
           
           <div className="pt-8">
@@ -76,7 +117,7 @@ export default function DashboardPage({
               className="w-full justify-start gap-3 py-6 text-red-400 border-red-500/20 hover:bg-red-500/10 hover:border-red-500/50"
             >
               <LogOut className="w-5 h-5" />
-              {lang === 'ru' ? 'Выход' : 'Chiqish'}
+              {dictionary.dashboard.logout}
             </Button>
           </div>
         </aside>
@@ -87,10 +128,10 @@ export default function DashboardPage({
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-white">
-                  {lang === 'ru' ? 'Добро пожаловать!' : 'Xush kelibsiz!'}
+                  {dictionary.dashboard.welcome}
                 </h1>
                 <div className="text-sm text-slate-400">
-                  Role: <span className="text-primary font-bold uppercase">{role}</span>
+                  Role: <span className="text-primary font-bold uppercase">{userRole}</span>
                 </div>
               </div>
 
@@ -98,7 +139,7 @@ export default function DashboardPage({
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-slate-400 text-base">
-                      {lang === 'ru' ? 'Активные заказы' : 'Faol buyurtmalar'}
+                      {dictionary.dashboard.active_orders}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -108,7 +149,7 @@ export default function DashboardPage({
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-slate-400 text-base">
-                      {lang === 'ru' ? 'Баланс' : 'Balans'}
+                      {dictionary.dashboard.balance}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -118,7 +159,7 @@ export default function DashboardPage({
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-slate-400 text-base">
-                      {lang === 'ru' ? 'Просмотры' : 'Ko\'rishlar'}
+                      {dictionary.dashboard.views}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
@@ -132,21 +173,19 @@ export default function DashboardPage({
                   <Package className="w-8 h-8 text-slate-600" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">
-                  {lang === 'ru' ? 'Здесь пока пусто' : 'Bu yerda hali bo\'sh'}
+                  {dictionary.dashboard.empty_state_title}
                 </h3>
                 <p className="text-slate-400 max-w-sm mb-6">
-                  {lang === 'ru' 
-                    ? 'У вас еще нет активных заказов или услуг. Начните работу прямо сейчас!' 
-                    : 'Sizda hali faol buyurtmalar yoki xizmatlar yo\'q. Ishni hoziroq boshlang!'}
+                  {dictionary.dashboard.empty_state_desc}
                 </p>
                 <Button 
-                  key={`overview-${role}`}
+                  key={`overview-${userRole}`}
                   onClick={() => router.push(`/${lang}/services`)}
                   className="px-8"
                 >
-                  {role === 'freelancer' 
-                    ? (lang === 'ru' ? 'Добавить услугу' : 'Xizmat qo\'shish')
-                    : (lang === 'ru' ? 'Найти исполнителя' : 'Ijrochi topish')}
+                  {userRole === 'freelancer' 
+                    ? dictionary.dashboard.add_service
+                    : dictionary.dashboard.find_performer}
                 </Button>
               </Card>
             </div>
@@ -155,23 +194,23 @@ export default function DashboardPage({
           {activeTab === 'items' && (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <h1 className="text-3xl font-bold text-white">
-                {role === 'freelancer' 
-                  ? (lang === 'ru' ? 'Мои услуги' : 'Mening xizmatlarim')
-                  : (lang === 'ru' ? 'Мои заказы' : 'Mening buyurtmalarim')}
+                {userRole === 'freelancer' 
+                  ? dictionary.dashboard.my_items
+                  : dictionary.dashboard.my_orders}
               </h1>
               <Card className="p-12 border-dashed border-2 border-dark-700 flex flex-col items-center justify-center text-center">
                 <Package className="w-12 h-12 text-slate-600 mb-4" />
                 <p className="text-slate-400">
-                  {lang === 'ru' ? 'Список пуст' : 'Ro\'yxat bo\'sh'}
+                  {dictionary.dashboard.list_empty}
                 </p>
                 <Button 
-                  key={role}
+                  key={userRole}
                   onClick={() => router.push(`/${lang}/services`)}
                   className="mt-6"
                 >
-                  {role === 'freelancer' 
-                    ? (lang === 'ru' ? 'Добавить услугу' : 'Xizmat qo\'shish')
-                    : (lang === 'ru' ? 'Найти исполнителя' : 'Ijrochi topish')}
+                  {userRole === 'freelancer' 
+                    ? dictionary.dashboard.add_service
+                    : dictionary.dashboard.find_performer}
                 </Button>
               </Card>
             </div>
@@ -181,16 +220,16 @@ export default function DashboardPage({
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-white">
-                  {lang === 'ru' ? 'Настройки профиля' : 'Profil sozlamalari'}
+                  {dictionary.dashboard.profile_settings}
                 </h1>
-                {(isEditing || isConfiguring) && (
-                  <Button variant="ghost" onClick={() => { setIsEditing(false); setIsConfiguring(false); }}>
-                    {lang === 'ru' ? 'Назад' : 'Orqaga'}
+                {(isEditingProfile || isConfiguringNotifications) && (
+                  <Button variant="ghost" onClick={() => { setIsEditingProfile(false); setIsConfiguringNotifications(false); }}>
+                    {dictionary.dashboard.back}
                   </Button>
                 )}
               </div>
               
-              {!isEditing && !isConfiguring ? (
+              {!isEditingProfile && !isConfiguringNotifications ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <Card className="p-6 space-y-6">
                     <div className="flex items-center gap-4">
@@ -198,16 +237,16 @@ export default function DashboardPage({
                         <User className="w-8 h-8 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-white text-lg">{lang === 'ru' ? 'Личные данные' : 'Shaxsiy ma\'lumotlar'}</h3>
-                        <p className="text-slate-400 text-sm">{lang === 'ru' ? 'Измените ваше имя и био' : 'Ismingiz va bioni o\'zgartiring'}</p>
+                        <h3 className="font-bold text-white text-lg">{dictionary.dashboard.personal_data}</h3>
+                        <p className="text-slate-400 text-sm">{dictionary.dashboard.edit_name_bio}</p>
                       </div>
                     </div>
                     <Button 
                       variant="outline" 
                       className="w-full"
-                      onClick={() => setIsEditing(true)}
+                      onClick={() => setIsEditingProfile(true)}
                     >
-                      {lang === 'ru' ? 'Редактировать' : 'Tahrirlash'}
+                      {dictionary.dashboard.manage}
                     </Button>
                   </Card>
 
@@ -217,16 +256,16 @@ export default function DashboardPage({
                         <Bell className="w-8 h-8 text-blue-500" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-white text-lg">{lang === 'ru' ? 'Уведомления' : 'Bildirishnomalar'}</h3>
-                        <p className="text-slate-400 text-sm">{lang === 'ru' ? 'Настройте оповещения' : 'Bildirishnomalarni sozlang'}</p>
+                        <h3 className="font-bold text-white text-lg">{dictionary.dashboard.notifications}</h3>
+                        <p className="text-slate-400 text-sm">{dictionary.dashboard.configure_alerts}</p>
                       </div>
                     </div>
                     <Button 
                       variant="outline" 
                       className="w-full"
-                      onClick={() => setIsConfiguring(true)}
+                      onClick={() => setIsConfiguringNotifications(true)}
                     >
-                      {lang === 'ru' ? 'Настроить' : 'Sozlash'}
+                      {dictionary.dashboard.configure_alerts}
                     </Button>
                   </Card>
 
@@ -236,57 +275,59 @@ export default function DashboardPage({
                         <CreditCard className="w-8 h-8 text-emerald-500" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-white text-lg">{lang === 'ru' ? 'Выплаты' : 'To\'lovlar'}</h3>
-                        <p className="text-slate-400 text-sm">{lang === 'ru' ? 'Кошелек и история' : 'Hamyon va tarix'}</p>
+                        <h3 className="font-bold text-white text-lg">{dictionary.dashboard.payments}</h3>
+                        <p className="text-slate-400 text-sm">{dictionary.dashboard.wallet_history}</p>
                       </div>
                     </div>
                     <Button 
                       variant="outline" 
                       className="w-full"
-                      onClick={() => alert(lang === 'ru' ? 'Управление выплатами будет доступно в следующей версии!' : 'To\'lovlarni boshqarish keyingi versiyada mavjud bo\'ladi!')}
+                      onClick={() => alert(dictionary.dashboard.payments_soon)}
                     >
-                      {lang === 'ru' ? 'Управление' : 'Boshqarish'}
+                      {dictionary.dashboard.manage}
                     </Button>
                   </Card>
                 </div>
-              ) : isEditing ? (
+              ) : isEditingProfile ? (
                 <Card className="p-8 max-w-2xl border-dark-700 bg-dark-800">
                   <div className="space-y-6">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-400">
-                        {lang === 'ru' ? 'Полное имя' : 'To\'liq ism'}
+                        {dictionary.dashboard.full_name}
                       </label>
                       <input 
                         type="text" 
-                        defaultValue="User Name"
+                        value={fullName}
+                        onChange={(e) => setFullName(e.target.value)}
                         className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-primary"
                       />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-slate-400">
-                        {lang === 'ru' ? 'О себе' : 'Men haqimda'}
+                        {dictionary.dashboard.about_me}
                       </label>
                       <textarea 
                         rows={4}
-                        defaultValue="Senior Developer from Tashkent"
+                        value={bio}
+                        onChange={(e) => setBio(e.target.value)}
                         className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-primary resize-none"
                       />
                     </div>
+                    {profileError && <p className="text-red-500 text-sm text-center">{profileError}</p>}
                     <div className="flex gap-4 pt-4">
                       <Button 
                         className="flex-grow"
-                        onClick={() => {
-                          alert(lang === 'ru' ? 'Изменения сохранены!' : 'O\'zgarishlar saqlandi!');
-                          setIsEditing(false);
-                        }}
+                        onClick={handleSaveProfile}
                       >
-                        {lang === 'ru' ? 'Сохранить' : 'Saqlash'}
+                        {dictionary.dashboard.save}
                       </Button>
                       <Button 
                         variant="ghost" 
-                        onClick={() => setIsEditing(false)}
+                        onClick={() => {
+                          setIsEditingProfile(false);
+                        }}
                       >
-                        {lang === 'ru' ? 'Отмена' : 'Bekor qilish'}
+                        {dictionary.dashboard.cancel}
                       </Button>
                     </div>
                   </div>
@@ -296,18 +337,20 @@ export default function DashboardPage({
                   <div className="space-y-6">
                     <div className="flex items-center justify-between p-4 bg-dark-700 rounded-xl">
                       <div>
-                        <h4 className="text-white font-bold">{lang === 'ru' ? 'Email уведомления' : 'Email bildirishnomalar'}</h4>
-                        <p className="text-slate-400 text-sm">{lang === 'ru' ? 'Получать письма о заказах' : 'Buyurtmalar haqida xat olish'}</p>
+                        <h4 className="text-white font-bold">{dictionary.dashboard.email_notifications}</h4>
+                        <p className="text-slate-400 text-sm">{dictionary.dashboard.get_order_emails}</p>
                       </div>
+                      {/* Toggle for Email Notifications */}
                       <div className="w-12 h-6 bg-primary rounded-full relative cursor-pointer">
                         <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full" />
                       </div>
                     </div>
                     <div className="flex items-center justify-between p-4 bg-dark-700 rounded-xl">
                       <div>
-                        <h4 className="text-white font-bold">{lang === 'ru' ? 'Telegram бот' : 'Telegram bot'}</h4>
-                        <p className="text-slate-400 text-sm">{lang === 'ru' ? 'Уведомления в мессенджер' : 'Messenjerga bildirishnomalar'}</p>
+                        <h4 className="text-white font-bold">{dictionary.dashboard.telegram_bot}</h4>
+                        <p className="text-slate-400 text-sm">{dictionary.dashboard.messenger_alerts}</p>
                       </div>
+                      {/* Toggle for Telegram Bot Notifications */}
                       <div className="w-12 h-6 bg-dark-600 rounded-full relative cursor-pointer">
                         <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full" />
                       </div>
@@ -316,17 +359,17 @@ export default function DashboardPage({
                       <Button 
                         className="flex-grow"
                         onClick={() => {
-                          alert(lang === 'ru' ? 'Настройки уведомлений сохранены!' : 'Bildirishnoma sozlamalari saqlandi!');
-                          setIsConfiguring(false);
+                          alert(dictionary.dashboard.notifications_saved);
+                          setIsConfiguringNotifications(false);
                         }}
                       >
-                        {lang === 'ru' ? 'Сохранить' : 'Saqlash'}
+                        {dictionary.dashboard.save}
                       </Button>
                       <Button 
                         variant="ghost" 
-                        onClick={() => setIsConfiguring(false)}
+                        onClick={() => setIsConfiguringNotifications(false)}
                       >
-                        {lang === 'ru' ? 'Назад' : 'Orqaga'}
+                        {dictionary.dashboard.back}
                       </Button>
                     </div>
                   </div>

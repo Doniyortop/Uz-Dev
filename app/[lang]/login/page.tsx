@@ -7,6 +7,7 @@ import { Locale, Dictionary } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
+import { signInWithEmailAndPassword, getSession } from '@/lib/supabase/auth';
 
 export default function LoginPage({
   params,
@@ -17,28 +18,44 @@ export default function LoginPage({
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [dictionary, setDictionary] = useState<Dictionary | null>(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
   // Load dictionary on client
   useEffect(() => {
     getDictionary(lang).then(setDictionary);
   }, [lang]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Simulate Auth logic
-    setTimeout(() => {
-      localStorage.setItem('is_auth', 'true');
-      window.dispatchEvent(new Event('auth-change'));
-      
-      const onboarded = localStorage.getItem('onboarded');
-      if (onboarded === 'true') {
-        router.push(`/${lang}/dashboard`);
+    setError(null);
+
+    try {
+      const { user, session } = await signInWithEmailAndPassword(email, password);
+
+      if (user && session) {
+        // Instead of localStorage, we rely on Supabase session management
+        // You might want to fetch user profile from Supabase and check onboarding status
+        // For now, let's assume successful login leads to dashboard or onboarding
+        const currentSession = await getSession();
+        if (currentSession) {
+          // In a real app, you'd check a user_profiles table for onboarding status
+          // For now, redirect to dashboard as a default successful login
+          router.push(`/${lang}/dashboard`);
+        } else {
+          // Handle case where session is not immediately available (shouldn't happen with signInWithPassword)
+          setError("Login successful, but no session found. Please try again.");
+        }
       } else {
-        router.push(`/${lang}/onboarding`);
+        setError("Login failed. Please check your credentials.");
       }
-    }, 1500);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!dictionary || !lang) return null;
@@ -63,6 +80,8 @@ export default function LoginPage({
                   required
                   type="email" 
                   placeholder="example@mail.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-dark-700 border border-dark-600 rounded-lg py-2.5 px-4 text-white focus:outline-none focus:border-primary/50 transition-colors"
                 />
               </div>
@@ -74,10 +93,13 @@ export default function LoginPage({
                   required
                   type="password" 
                   placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-dark-700 border border-dark-600 rounded-lg py-2.5 px-4 text-white focus:outline-none focus:border-primary/50 transition-colors"
                 />
               </div>
             </div>
+            {error && <p className="text-red-500 text-sm text-center">{error}</p>}
             <Button disabled={isLoading} className="w-full py-6 text-lg font-bold">
               {isLoading ? (
                 <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />

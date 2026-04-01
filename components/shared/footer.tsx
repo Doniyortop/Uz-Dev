@@ -20,13 +20,13 @@ export default async function Footer({ lang }: { lang: Locale }) {
               {dictionary.hero.subtitle}
             </p>
             <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 rounded-full bg-dark-800 flex items-center justify-center text-slate-400 hover:text-primary transition-colors border border-dark-700">
+              <a href="https://github.com/Doniyortop/Uz-Dev" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-dark-800 flex items-center justify-center text-slate-400 hover:text-primary transition-colors border border-dark-700">
                 <Github className="w-5 h-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-dark-800 flex items-center justify-center text-slate-400 hover:text-primary transition-colors border border-dark-700">
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-dark-800 flex items-center justify-center text-slate-400 hover:text-primary transition-colors border border-dark-700">
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-dark-800 flex items-center justify-center text-slate-400 hover:text-primary transition-colors border border-dark-700">
+              <a href="https://t.me/" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-dark-800 flex items-center justify-center text-slate-400 hover:text-primary transition-colors border border-dark-700">
                 <Send className="w-5 h-5" />
               </a>
             </div>
@@ -35,12 +35,14 @@ export default async function Footer({ lang }: { lang: Locale }) {
           <div>
             <h4 className="text-white font-bold mb-6">{dictionary.common.categories}</h4>
             <ul className="space-y-4">
-              {Object.entries(dictionary.categories).map(([key, value]: [string, string]) => (
-                <li key={key}>
-                  <Link href={`/${lang}/services?category=${key}`} className="text-slate-400 hover:text-primary text-sm transition-colors">
-                    {value}
-                  </Link>
-                </li>
+              {Object.entries(dictionary.categories)
+                .filter(([key]) => key !== 'find_experts' && key !== 'view_services')
+                .map(([key, value]: [string, string]) => (
+                  <li key={key}>
+                    <Link href={`/${lang}/services?category=${key}`} className="text-slate-400 hover:text-primary text-sm transition-colors">
+                      {value}
+                    </Link>
+                  </li>
               ))}
             </ul>
           </div>
@@ -50,16 +52,16 @@ export default async function Footer({ lang }: { lang: Locale }) {
             <ul className="space-y-4 text-sm text-slate-400">
               <li><Link href={`/${lang}/services`} className="hover:text-primary transition-colors">{dictionary.footer.all_services}</Link></li>
               <li><Link href={`/${lang}/freelancers`} className="hover:text-primary transition-colors">{dictionary.footer.freelancers}</Link></li>
-              <li><Link href="#" className="hover:text-primary transition-colors">{dictionary.footer.about}</Link></li>
+              <li><Link href={`/${lang}/about`} className="hover:text-primary transition-colors">{dictionary.footer.about}</Link></li>
             </ul>
           </div>
 
           <div>
             <h4 className="text-white font-bold mb-6">{dictionary.footer.support}</h4>
             <ul className="space-y-4 text-sm text-slate-400">
-              <li><Link href="#" className="hover:text-primary transition-colors">{dictionary.footer.help}</Link></li>
-              <li><Link href="#" className="hover:text-primary transition-colors">{dictionary.footer.rules}</Link></li>
-              <li><Link href="#" className="hover:text-primary transition-colors">{dictionary.footer.privacy}</Link></li>
+              <li><Link href={`/${lang}/help`} className="hover:text-primary transition-colors">{dictionary.footer.help}</Link></li>
+              <li><Link href={`/${lang}/rules`} className="hover:text-primary transition-colors">{dictionary.footer.rules}</Link></li>
+              <li><Link href={`/${lang}/privacy`} className="hover:text-primary transition-colors">{dictionary.footer.privacy}</Link></li>
             </ul>
           </div>
         </div>

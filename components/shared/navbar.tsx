@@ -7,9 +7,12 @@ import { Locale, Dictionary } from '@/types';
 import { getDictionary } from '@/lib/i18n/get-dictionary';
 import { Button } from '@/components/ui/button';
 import { Globe, User, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react';
+import { getSession, signOut, getUser } from '@/lib/supabase/auth';
+import { Session, User as SupabaseUser } from '@supabase/supabase-js';
 
 export default function Navbar({ lang }: { lang: Locale }) {
-  const [isAuth, setIsAuth] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<SupabaseUser | null>(null);
   const [dictionary, setDictionary] = useState<Dictionary | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -24,18 +27,26 @@ export default function Navbar({ lang }: { lang: Locale }) {
   };
 
   useEffect(() => {
-    // Initial check
-    const checkAuth = () => {
-      setIsAuth(localStorage.getItem('is_auth') === 'true');
+    const fetchSessionAndUser = async () => {
+      const currentSession = await getSession();
+      setSession(currentSession);
+      if (currentSession) {
+        const currentUser = await getUser();
+        setUser(currentUser);
+      } else {
+        setUser(null);
+      }
     };
     
-    checkAuth();
+    fetchSessionAndUser();
     getDictionary(lang).then(setDictionary);
 
-    // Listen for auth changes
-    window.addEventListener('auth-change', checkAuth);
+    const handleAuthChange = () => {
+      fetchSessionAndUser();
+    };
+
+    window.addEventListener('auth-change', handleAuthChange);
     
-    // Close menu on click outside
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setIsMenuOpen(false);
@@ -45,22 +56,28 @@ export default function Navbar({ lang }: { lang: Locale }) {
     document.addEventListener('mousedown', handleClickOutside);
     
     return () => {
-      window.removeEventListener('auth-change', checkAuth);
+      window.removeEventListener('auth-change', handleAuthChange);
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [lang]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('is_auth');
-    localStorage.removeItem('user_role');
-    localStorage.removeItem('onboarded');
-    setIsAuth(false);
-    setIsMenuOpen(false);
-    window.dispatchEvent(new Event('auth-change'));
-    window.location.href = `/${lang}`;
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      setSession(null);
+      setUser(null);
+      setIsMenuOpen(false);
+      // No need to dispatch custom event, Supabase handles it internally
+      window.location.href = `/${lang}`;
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
   };
 
   if (!dictionary) return null;
+
+  const isAuthenticated = !!session;
+  const userName = user?.email || dictionary.auth.user_name;
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-dark-700 bg-dark-900/80 backdrop-blur-md">
@@ -88,7 +105,7 @@ export default function Navbar({ lang }: { lang: Locale }) {
             </span>
           </Link>
 
-          {isAuth ? (
+          {isAuthenticated ? (
             <div className="relative" ref={menuRef}>
               <button 
                 onClick={(e) => {
@@ -98,9 +115,9 @@ export default function Navbar({ lang }: { lang: Locale }) {
                 className="flex items-center gap-3 pl-3 pr-2 py-1.5 rounded-full bg-dark-800 border border-dark-700 hover:border-primary/50 transition-all group"
               >
                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm">
-                  {dictionary.auth.user_name[0].toUpperCase()}
+                  {userName[0].toUpperCase()}
                 </div>
-                <span className="text-sm font-medium text-white hidden sm:block">{dictionary.auth.user_name}</span>
+                <span className="text-sm font-medium text-white hidden sm:block">{userName}</span>
                 <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isMenuOpen ? 'rotate-180' : ''}`} />
               </button>
 
@@ -116,7 +133,7 @@ export default function Navbar({ lang }: { lang: Locale }) {
                       {dictionary.auth.dashboard}
                     </Link>
                     <Link 
-                      href={`/${lang}/freelancers/doniyor`}
+                      href={`/${lang}/freelancers/${user?.id || 'doniyor'}`}
                       onClick={() => setIsMenuOpen(false)}
                       className="flex items-center gap-3 px-3 py-2.5 text-sm text-slate-300 hover:text-white hover:bg-dark-700 rounded-lg transition-colors"
                     >
