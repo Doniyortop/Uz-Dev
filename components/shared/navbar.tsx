@@ -9,6 +9,7 @@ import { Globe, User, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react'
 
 export default function Navbar({ lang }: { lang: Locale }) {
   const [isAuth, setIsAuth] = useState(false);
+  const [userName, setUserName] = useState('User Name');
   const [dictionary, setDictionary] = useState<Dictionary | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -17,6 +18,8 @@ export default function Navbar({ lang }: { lang: Locale }) {
     // Initial check
     const checkAuth = () => {
       setIsAuth(localStorage.getItem('is_auth') === 'true');
+      const savedName = localStorage.getItem('user_name');
+      if (savedName) setUserName(savedName);
     };
     
     checkAuth();
@@ -44,7 +47,10 @@ export default function Navbar({ lang }: { lang: Locale }) {
     localStorage.removeItem('is_auth');
     localStorage.removeItem('user_role');
     localStorage.removeItem('onboarded');
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_bio');
     setIsAuth(false);
+    setUserName('User Name');
     setIsMenuOpen(false);
     window.dispatchEvent(new Event('auth-change'));
     window.location.href = `/${lang}`;
@@ -85,12 +91,12 @@ export default function Navbar({ lang }: { lang: Locale }) {
                   e.preventDefault();
                   setIsMenuOpen(!isMenuOpen);
                 }}
-                className="flex items-center gap-3 pl-3 pr-2 py-1.5 rounded-full bg-dark-800 border border-dark-700 hover:border-primary/50 transition-all group"
+                className="flex items-center gap-3 pl-4 border-l border-dark-700 group"
               >
                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white font-bold text-sm">
-                  U
+                  {userName.charAt(0).toUpperCase()}
                 </div>
-                <span className="text-sm font-medium text-white hidden sm:block">User Name</span>
+                <span className="text-sm font-medium text-white hidden sm:block">{userName}</span>
                 <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isMenuOpen ? 'rotate-180' : ''}`} />
               </button>
 
