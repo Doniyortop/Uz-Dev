@@ -49,6 +49,16 @@ export interface Dictionary {
     cta: string;
   };
   categories: Record<string, string>;
+  dashboard: {
+    add_service: string;
+    edit_service: string;
+    service_title: string;
+    service_description: string;
+    service_price: string;
+    service_category: string;
+    service_tags: string;
+    create: string;
+  };
   footer: {
     about: string;
     platform: string;
