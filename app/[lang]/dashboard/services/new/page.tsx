@@ -18,6 +18,14 @@ export default function NewServicePage({
   const router = useRouter();
   const [dictionary, setDictionary] = useState<Dictionary | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [formData, setFormData] = useState({
+    title: '',
+    category: 'tg_bots',
+    price: '',
+    description: '',
+    tags: ''
+  });
 
   useEffect(() => {
     getDictionary(lang).then(setDictionary);
@@ -29,10 +37,33 @@ export default function NewServicePage({
     }
   }, [lang, router]);
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
+    // Create new service object
+    const newService = {
+      id: Math.random().toString(36).substr(2, 9),
+      ...formData,
+      image: previewImage,
+      createdAt: new Date().toISOString()
+    };
+
+    // Save to localStorage (mocking database)
+    const existingServices = JSON.parse(localStorage.getItem('user_services') || '[]');
+    localStorage.setItem('user_services', JSON.stringify([...existingServices, newService]));
+
     // Simulate API call
     setTimeout(() => {
       setIsLoading(false);
@@ -76,6 +107,8 @@ export default function NewServicePage({
               <input 
                 required
                 type="text" 
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                 placeholder={lang === 'ru' ? 'Например: Бот для магазина' : 'Masalan: Do\'kon uchun bot'}
                 className="w-full bg-dark-700 border border-dark-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
               />
@@ -86,7 +119,11 @@ export default function NewServicePage({
               <label className="text-sm font-medium text-slate-300">
                 {dictionary.dashboard.service_category}
               </label>
-              <select className="w-full bg-dark-700 border border-dark-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors appearance-none">
+              <select 
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                className="w-full bg-dark-700 border border-dark-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors appearance-none"
+              >
                 {Object.entries(dictionary.categories).map(([key, value]) => (
                   <option key={key} value={key}>{value}</option>
                 ))}
@@ -104,6 +141,8 @@ export default function NewServicePage({
                   required
                   type="number" 
                   min="5"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   placeholder="50"
                   className="w-full bg-dark-700 border border-dark-600 rounded-xl pl-8 pr-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
                 />
@@ -118,6 +157,8 @@ export default function NewServicePage({
               <textarea 
                 required
                 rows={5}
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 placeholder={lang === 'ru' ? 'Опишите, что входит в стоимость...' : 'Narxga nimalar kirishini tasvirlang...'}
                 className="w-full bg-dark-700 border border-dark-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors resize-none"
               />
@@ -130,6 +171,8 @@ export default function NewServicePage({
               </label>
               <input 
                 type="text" 
+                value={formData.tags}
+                onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
                 placeholder="Telegram, Node.js, API"
                 className="w-full bg-dark-700 border border-dark-600 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
               />
@@ -140,9 +183,33 @@ export default function NewServicePage({
               <label className="text-sm font-medium text-slate-300">
                 {lang === 'ru' ? 'Обложка услуги' : 'Xizmat muqovasi'}
               </label>
-              <div className="border-2 border-dashed border-dark-600 rounded-xl p-8 flex flex-col items-center justify-center gap-3 text-slate-500 hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer">
-                <ImageIcon className="w-8 h-8" />
-                <span className="text-sm">{lang === 'ru' ? 'Нажмите, чтобы загрузить изображение' : 'Rasm yuklash uchun bosing'}</span>
+              <div 
+                onClick={() => document.getElementById('cover-upload')?.click()}
+                className="border-2 border-dashed border-dark-600 rounded-xl p-8 flex flex-col items-center justify-center gap-3 text-slate-500 hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer overflow-hidden relative min-h-[200px]"
+              >
+                {previewImage ? (
+                  <>
+                    <img src={previewImage} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-50" />
+                    <div className="relative z-10 flex flex-col items-center gap-2">
+                      <ImageIcon className="w-8 h-8 text-white shadow-sm" />
+                      <span className="text-sm text-white font-medium bg-dark-900/50 px-3 py-1 rounded-full backdrop-blur-sm">
+                        {lang === 'ru' ? 'Нажмите, чтобы изменить' : 'O\'zgartirish uchun bosing'}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <ImageIcon className="w-8 h-8" />
+                    <span className="text-sm">{lang === 'ru' ? 'Нажмите, чтобы загрузить изображение' : 'Rasm yuklash uchun bosing'}</span>
+                  </>
+                )}
+                <input 
+                  id="cover-upload"
+                  type="file" 
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="hidden"
+                />
               </div>
             </div>
           </div>

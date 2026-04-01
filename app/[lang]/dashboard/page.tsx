@@ -20,9 +20,17 @@ export default function DashboardPage({
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [isEditing, setIsEditing] = useState(false);
   const [isConfiguring, setIsConfiguring] = useState(false);
+  const [profileName, setProfileName] = useState('User Name');
+  const [profileBio, setProfileBio] = useState('Senior Developer from Tashkent');
 
   useEffect(() => {
     const savedRole = localStorage.getItem('user_role');
+    const savedName = localStorage.getItem('user_name');
+    const savedBio = localStorage.getItem('user_bio');
+    
+    if (savedName) setProfileName(savedName);
+    if (savedBio) setProfileBio(savedBio);
+    
     if (!savedRole) {
       router.push(`/${lang}/login`);
     }
@@ -202,8 +210,8 @@ export default function DashboardPage({
                         <User className="w-8 h-8 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-white text-lg">{lang === 'ru' ? 'Личные данные' : 'Shaxsiy ma\'lumotlar'}</h3>
-                        <p className="text-slate-400 text-sm">{lang === 'ru' ? 'Измените ваше имя и био' : 'Ismingiz va bioni o\'zgartiring'}</p>
+                        <h3 className="font-bold text-white text-lg">{profileName}</h3>
+                        <p className="text-slate-400 text-sm line-clamp-1">{profileBio}</p>
                       </div>
                     </div>
                     <Button 
@@ -291,7 +299,8 @@ export default function DashboardPage({
                       </label>
                       <input 
                         type="text" 
-                        defaultValue="User Name"
+                        value={profileName}
+                        onChange={(e) => setProfileName(e.target.value)}
                         className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-primary"
                       />
                     </div>
@@ -301,7 +310,8 @@ export default function DashboardPage({
                       </label>
                       <textarea 
                         rows={4}
-                        defaultValue="Senior Developer from Tashkent"
+                        value={profileBio}
+                        onChange={(e) => setProfileBio(e.target.value)}
                         className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-primary resize-none"
                       />
                     </div>
@@ -309,6 +319,8 @@ export default function DashboardPage({
                       <Button 
                         className="flex-grow"
                         onClick={() => {
+                          localStorage.setItem('user_name', profileName);
+                          localStorage.setItem('user_bio', profileBio);
                           alert(lang === 'ru' ? 'Изменения сохранены!' : 'O\'zgarishlar saqlandi!');
                           setIsEditing(false);
                         }}
