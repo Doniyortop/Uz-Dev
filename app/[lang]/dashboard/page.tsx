@@ -135,25 +135,21 @@ export default function DashboardPage({
                   {lang === 'ru' ? 'Здесь пока пусто' : 'Bu yerda hali bo\'sh'}
                 </h3>
                 <p className="text-slate-400 max-w-sm mb-6">
-                  {lang === 'ru' 
-                    ? 'У вас еще нет активных заказов или услуг. Начните работу прямо сейчас!' 
-                    : 'Sizda hali faol buyurtmalar yoki xizmatlar yo\'q. Ishni hoziroq boshlang!'}
-                </p>
-                <Button 
-                  key={`overview-${role}`}
-                  onClick={() => {
-                    if (role === 'freelancer') {
-                      router.push(`/${lang}/dashboard/services/new`);
-                    } else {
-                      router.push(`/${lang}/services`);
-                    }
-                  }}
-                  className="px-8"
-                >
                   {role === 'freelancer' 
-                    ? (lang === 'ru' ? 'Добавить услугу' : 'Xizmat qo\'shish')
-                    : (lang === 'ru' ? 'Найти исполнителя' : 'Ijrochi topish')}
-                </Button>
+                    ? (lang === 'ru' ? 'У вас еще нет активных услуг. Добавьте первую услугу!' : 'Sizda hali faol xizmatlar yo\'q. Birinchi xizmatingizni qo\'shing!')
+                    : (lang === 'ru' ? 'У вас еще нет активных заказов. Найдите исполнителя!' : 'Sizda hali faol buyurtmalar yo\'q. Ijrochi toping!')}
+                </p>
+                {role && (
+                  <Button 
+                    key={`overview-${role}`}
+                    href={role === 'freelancer' ? `/${lang}/dashboard/services/new` : `/${lang}/services`}
+                    className="px-8"
+                  >
+                    {role === 'freelancer' 
+                      ? (lang === 'ru' ? 'Добавить услугу' : 'Xizmat qo\'shish')
+                      : (lang === 'ru' ? 'Найти исполнителя' : 'Ijrochi topish')}
+                  </Button>
+                )}
               </Card>
             </div>
           )}
@@ -170,21 +166,17 @@ export default function DashboardPage({
                 <p className="text-slate-400">
                   {lang === 'ru' ? 'Список пуст' : 'Ro\'yxat bo\'sh'}
                 </p>
-                <Button 
-                  key={role}
-                  onClick={() => {
-                    if (role === 'freelancer') {
-                      router.push(`/${lang}/dashboard/services/new`);
-                    } else {
-                      router.push(`/${lang}/services`);
-                    }
-                  }}
-                  className="mt-6"
-                >
-                  {role === 'freelancer' 
-                    ? (lang === 'ru' ? 'Добавить услугу' : 'Xizmat qo\'shish')
-                    : (lang === 'ru' ? 'Найти исполнителя' : 'Ijrochi topish')}
-                </Button>
+                {role && (
+                  <Button 
+                    key={`items-${role}`}
+                    href={role === 'freelancer' ? `/${lang}/dashboard/services/new` : `/${lang}/services`}
+                    className="mt-6"
+                  >
+                    {role === 'freelancer' 
+                      ? (lang === 'ru' ? 'Добавить услугу' : 'Xizmat qo\'shish')
+                      : (lang === 'ru' ? 'Найти исполнителя' : 'Ijrochi topish')}
+                  </Button>
+                )}
               </Card>
             </div>
           )}
@@ -258,6 +250,35 @@ export default function DashboardPage({
                       onClick={() => alert(lang === 'ru' ? 'Управление выплатами будет доступно в следующей версии!' : 'To\'lovlarni boshqarish keyingi versiyada mavjud bo\'ladi!')}
                     >
                       {lang === 'ru' ? 'Управление' : 'Boshqarish'}
+                    </Button>
+                  </Card>
+
+                  <Card className="p-6 space-y-6 border-primary/20 bg-primary/5">
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
+                        <LayoutDashboard className="w-8 h-8 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-white text-lg">{lang === 'ru' ? 'Смена роли' : 'Rolni o\'zgartirish'}</h3>
+                        <p className="text-slate-400 text-sm">
+                          {lang === 'ru' 
+                            ? `Текущая роль: ${role === 'freelancer' ? 'Фрилансер' : 'Заказчик'}` 
+                            : `Hozirgi rol: ${role === 'freelancer' ? 'Frilanser' : 'Mijoz'}`}
+                        </p>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="primary" 
+                      className="w-full"
+                      onClick={() => {
+                        const newRole = role === 'freelancer' ? 'client' : 'freelancer';
+                        localStorage.setItem('user_role', newRole);
+                        setRole(newRole);
+                        window.dispatchEvent(new Event('auth-change'));
+                        alert(lang === 'ru' ? 'Роль успешно изменена!' : 'Rol muvaffaqiyatli o\'zgartirildi!');
+                      }}
+                    >
+                      {lang === 'ru' ? 'Переключить роль' : 'Rolni almashtirish'}
                     </Button>
                   </Card>
                 </div>
