@@ -17,6 +17,10 @@ export interface Profile {
   rating: number;
   role?: 'freelancer' | 'client';
   onboarded?: boolean;
+  is_online?: boolean;
+  last_seen?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Service {
@@ -33,6 +37,28 @@ export interface Service {
   image?: string | null;
   freelancer_name?: string;
   telegram?: string;
+}
+
+export interface PortfolioItem {
+  id: string;
+  freelancer_id: string;
+  title: string;
+  description?: string;
+  image_url: string;
+  link?: string;
+  tags?: string[];
+  created_at?: string;
+}
+
+export interface Review {
+  id: string;
+  service_id?: string;
+  freelancer_id: string;
+  client_id: string;
+  client_name: string;
+  rating: number;
+  comment: string;
+  created_at: string;
 }
 
 export interface Dictionary {

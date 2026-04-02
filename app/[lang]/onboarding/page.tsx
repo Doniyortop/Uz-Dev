@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Briefcase, Check } from 'lucide-react';
 
+import { getUser } from '@/lib/supabase/auth';
+import { updateUserProfile } from '@/lib/supabase/data';
+
 export default function OnboardingPage({
   params,
 }: {
@@ -17,15 +20,37 @@ export default function OnboardingPage({
   const [role, setRole] = useState<'freelancer' | 'client' | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleComplete = () => {
+  const handleComplete = async () => {
     if (!role) return;
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
+    
+    try {
+      const user = await getUser();
+      if (!user) {
+        router.push(`/${lang}/login`);
+        return;
+      }
+
+      await updateUserProfile(user.id, { 
+        role, 
+        onboarded: true,
+        full_name: localStorage.getItem('user_name') || ''
+      });
+
+      // Update legacy localStorage
+      localStorage.setItem('user_role', role);
+      localStorage.setItem('onboarded', 'true');
+      
+      router.push(`/${lang}/dashboard`);
+    } catch (err: any) {
+      console.error('Onboarding error:', err);
+      // Fallback to localStorage if Supabase fails (maybe table not created yet)
       localStorage.setItem('user_role', role);
       localStorage.setItem('onboarded', 'true');
       router.push(`/${lang}/dashboard`);
-    }, 1500);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

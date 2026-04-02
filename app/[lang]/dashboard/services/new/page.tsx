@@ -9,6 +9,10 @@ import { Card } from '@/components/ui/card';
 import { ArrowLeft, Save, Sparkles, Image as ImageIcon } from 'lucide-react';
 import Link from 'next/link';
 
+import { createService } from '@/lib/supabase/services';
+import { getUser } from '@/lib/supabase/auth';
+import { uploadServiceImage } from '@/lib/supabase/storage';
+
 export default function NewServicePage({
   params,
 }: {
@@ -19,6 +23,7 @@ export default function NewServicePage({
   const [dictionary, setDictionary] = useState<Dictionary | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({
     title: '',
     category: 'tg_bots',
@@ -41,6 +46,7 @@ export default function NewServicePage({
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setImageFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setPreviewImage(reader.result as string);
@@ -53,26 +59,49 @@ export default function NewServicePage({
     e.preventDefault();
     setIsLoading(true);
     
-    // Create new service object
-    const userName = localStorage.getItem('user_name') || 'Freelancer';
-    const newService = {
-      id: Math.random().toString(36).substr(2, 9),
-      ...formData,
-      freelancer_name: userName,
-      image: previewImage,
-      createdAt: new Date().toISOString()
-    };
+    try {
+      const user = await getUser();
+      if (!user) {
+        router.push(`/${lang}/login`);
+        return;
+      }
 
-    // Save to localStorage (mocking database)
-    const existingServices = JSON.parse(localStorage.getItem('user_services') || '[]');
-    localStorage.setItem('user_services', JSON.stringify([...existingServices, newService]));
+      let imageUrl = null;
+      if (imageFile) {
+        imageUrl = await uploadServiceImage(imageFile);
+      }
 
-    // Simulate API call
-    setTimeout(() => {
+      const userName = localStorage.getItem('user_name') || 'Freelancer';
+      
+      const newService = {
+        freelancer_id: user.id,
+        category_id: formData.category,
+        title_ru: formData.title,
+        title_uz: formData.title, // Simplified for now
+        description_ru: formData.description,
+        description_uz: formData.description, // Simplified for now
+        price: parseFloat(formData.price) || 0,
+        tags: formData.tags.split(',').map(t => t.trim()),
+        is_active: true,
+        image: imageUrl || previewImage,
+        freelancer_name: userName,
+        telegram: formData.telegram
+      };
+
+      await createService(newService);
+
+      // Legacy support for catalog (if it still uses localStorage)
+      const existingServices = JSON.parse(localStorage.getItem('user_services') || '[]');
+      localStorage.setItem('user_services', JSON.stringify([...existingServices, { ...newService, id: Math.random().toString(36).substr(2, 9) }]));
+
       setIsLoading(false);
       alert(lang === 'ru' ? 'Услуга успешно добавлена!' : 'Xizmat muvaffaqiyatli qo\'shildi!');
       router.push(`/${lang}/dashboard`);
-    }, 1500);
+    } catch (err: any) {
+      console.error('Error creating service:', err);
+      setIsLoading(false);
+      alert(lang === 'ru' ? 'Ошибка при создании услуги' : 'Xizmat yaratishda xatolik');
+    }
   };
 
   if (!dictionary) return null;

@@ -8,6 +8,8 @@ import { getDictionary } from '@/lib/i18n/get-dictionary';
 import { Button } from '@/components/ui/button';
 import { Globe, User, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react';
 
+import { getUser, signOut } from '@/lib/supabase/auth';
+
 export default function Navbar({ lang }: { lang: Locale }) {
   const [isAuth, setIsAuth] = useState(false);
   const [userName, setUserName] = useState('User Name');
@@ -19,10 +21,27 @@ export default function Navbar({ lang }: { lang: Locale }) {
 
   useEffect(() => {
     // Initial check
-    const checkAuth = () => {
-      setIsAuth(localStorage.getItem('is_auth') === 'true');
-      const savedName = localStorage.getItem('user_name');
-      if (savedName) setUserName(savedName);
+    const checkAuth = async () => {
+      try {
+        const user = await getUser();
+        if (user) {
+          setIsAuth(true);
+          const savedName = localStorage.getItem('user_name');
+          if (savedName) {
+            setUserName(savedName);
+          } else if (user.user_metadata?.full_name) {
+            setUserName(user.user_metadata.full_name);
+          } else if (user.email) {
+            setUserName(user.email.split('@')[0]);
+          }
+        } else {
+          setIsAuth(false);
+        }
+      } catch (err) {
+        setIsAuth(localStorage.getItem('is_auth') === 'true');
+        const savedName = localStorage.getItem('user_name');
+        if (savedName) setUserName(savedName);
+      }
     };
     
     checkAuth();
@@ -55,7 +74,13 @@ export default function Navbar({ lang }: { lang: Locale }) {
     router.push(newPath);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await signOut();
+    } catch (err) {
+      console.error('Logout error:', err);
+    }
+    
     localStorage.removeItem('is_auth');
     localStorage.removeItem('user_role');
     localStorage.removeItem('onboarded');

@@ -7,6 +7,7 @@ import { Locale, Dictionary } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
+import { signInWithEmailAndPassword } from '@/lib/supabase/auth';
 
 export default function LoginPage({
   params,
@@ -16,19 +17,25 @@ export default function LoginPage({
   const { lang } = use(params);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [dictionary, setDictionary] = useState<Dictionary | null>(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   // Load dictionary on client
   useEffect(() => {
     getDictionary(lang).then(setDictionary);
   }, [lang]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
     
-    // Simulate Auth logic
-    setTimeout(() => {
+    try {
+      await signInWithEmailAndPassword(email, password);
+      
+      // Sync with legacy localStorage for compatibility with current components
       localStorage.setItem('is_auth', 'true');
       window.dispatchEvent(new Event('auth-change'));
       
@@ -38,7 +45,11 @@ export default function LoginPage({
       } else {
         router.push(`/${lang}/onboarding`);
       }
-    }, 1500);
+    } catch (err: any) {
+      setError(err.message || (lang === 'ru' ? 'Ошибка входа' : 'Kirishda xatolik'));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!dictionary || !lang) return null;
@@ -56,12 +67,19 @@ export default function LoginPage({
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-6">
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg text-sm text-center">
+                {error}
+              </div>
+            )}
             <div className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-300">Email</label>
                 <input 
                   required
                   type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="example@mail.com"
                   className="w-full bg-dark-700 border border-dark-600 rounded-lg py-2.5 px-4 text-white focus:outline-none focus:border-primary/50 transition-colors"
                 />
@@ -73,6 +91,8 @@ export default function LoginPage({
                 <input 
                   required
                   type="password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="w-full bg-dark-700 border border-dark-600 rounded-lg py-2.5 px-4 text-white focus:outline-none focus:border-primary/50 transition-colors"
                 />

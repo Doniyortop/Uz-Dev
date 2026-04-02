@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 
+import { signUpWithEmailAndPassword } from '@/lib/supabase/auth';
+
 export default function RegisterPage({
   params,
 }: {
@@ -16,23 +18,36 @@ export default function RegisterPage({
   const { lang } = use(params);
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [dictionary, setDictionary] = useState<Dictionary | null>(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
 
   // Load dictionary on client
   useEffect(() => {
     getDictionary(lang).then(setDictionary);
   }, [lang]);
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
     
-    // Simulate Auth logic
-    setTimeout(() => {
+    try {
+      await signUpWithEmailAndPassword(email, password);
+      
+      // Save name and auth status for legacy compatibility
+      localStorage.setItem('user_name', fullName);
       localStorage.setItem('is_auth', 'true');
       window.dispatchEvent(new Event('auth-change'));
+      
       router.push(`/${lang}/onboarding`);
-    }, 1500);
+    } catch (err: any) {
+      setError(err.message || (lang === 'ru' ? 'Ошибка регистрации' : 'Ro\'yxatdan o\'tishda xatolik'));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!dictionary || !lang) return null;
@@ -50,6 +65,11 @@ export default function RegisterPage({
         </CardHeader>
         <CardContent>
           <form onSubmit={handleRegister} className="space-y-6">
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg text-sm text-center">
+                {error}
+              </div>
+            )}
             <div className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-300">
@@ -58,6 +78,8 @@ export default function RegisterPage({
                 <input 
                   required
                   type="text" 
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   placeholder="Doniyor Uzakov"
                   className="w-full bg-dark-700 border border-dark-600 rounded-lg py-2.5 px-4 text-white focus:outline-none focus:border-primary/50 transition-colors"
                 />
@@ -67,6 +89,8 @@ export default function RegisterPage({
                 <input 
                   required
                   type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="example@mail.com"
                   className="w-full bg-dark-700 border border-dark-600 rounded-lg py-2.5 px-4 text-white focus:outline-none focus:border-primary/50 transition-colors"
                 />
@@ -78,6 +102,8 @@ export default function RegisterPage({
                 <input 
                   required
                   type="password" 
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   className="w-full bg-dark-700 border border-dark-600 rounded-lg py-2.5 px-4 text-white focus:outline-none focus:border-primary/50 transition-colors"
                 />
