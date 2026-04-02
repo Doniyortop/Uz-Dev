@@ -1,11 +1,29 @@
 services:
+  # Web Service
   - type: web
     name: uzdev-hub
     runtime: node
     buildCommand: npm install && npm run build
-    startCommand: npm run start
+    startCommand: npm start
+    plan: free
     envVars:
       - key: NODE_VERSION
         value: 20.10.0
       - key: NEXT_TELEMETRY_DISABLED
         value: 1
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+        description: Supabase Project URL
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+        description: Supabase Anonymous Key
+    healthCheckPath: /
+    autoDeploy: true
+    buildFilter:
+      paths:
+        - src/**
+        - public/**
+        - package*.json
+        - next.config.js
+
+version: "1"
