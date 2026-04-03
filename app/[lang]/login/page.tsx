@@ -27,6 +27,27 @@ export default function LoginPage({
     getDictionary(lang).then(setDictionary);
   }, [lang]);
 
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { getSession } = await import('@/lib/supabase/auth');
+        const session = await getSession();
+        if (session) {
+          const onboarded = localStorage.getItem('onboarded');
+          if (onboarded === 'true') {
+            router.push(`/${lang}/dashboard`);
+          } else {
+            router.push(`/${lang}/onboarding`);
+          }
+        }
+      } catch (error) {
+        console.log('No active session');
+      }
+    };
+    checkAuth();
+  }, [lang, router]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);

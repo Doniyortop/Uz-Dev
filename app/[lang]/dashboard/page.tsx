@@ -36,15 +36,23 @@ export default function DashboardPage({
       try {
         const sessionData = await getSession();
         if (!sessionData) {
+          console.log('No session found, redirecting to login');
           router.push(`/${lang}/login`);
           return;
         }
 
+        console.log('Session found:', sessionData.user?.email);
         setSession(sessionData);
 
         const [profileData, servicesData] = await Promise.all([
-          getProfile(sessionData.user.id),
-          getServicesByFreelancerId(sessionData.user.id)
+          getProfile(sessionData.user.id).catch(err => {
+            console.log('Profile not found, creating default');
+            return null;
+          }),
+          getServicesByFreelancerId(sessionData.user.id).catch(err => {
+            console.log('Services not found');
+            return [];
+          })
         ]);
 
         setProfile(profileData);
@@ -63,8 +71,16 @@ export default function DashboardPage({
   }, [router, lang]);
 
   const handleLogout = async () => {
-    await signOut();
-    router.push(`/${lang}`);
+    try {
+      await signOut();
+      localStorage.removeItem('is_auth');
+      localStorage.removeItem('onboarded');
+      window.dispatchEvent(new Event('auth-change'));
+      router.push(`/${lang}`);
+    } catch (error) {
+      console.error('Error logging out:', error);
+      router.push(`/${lang}`);
+    }
   };
 
   const handleSaveProfile = async () => {
