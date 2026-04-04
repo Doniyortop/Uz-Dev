@@ -1,5 +1,6 @@
 import '../globals.css';
 import { Inter } from 'next/font/google';
+import Navbar from '@/components/shared/navbar';
 import Footer from '@/components/shared/footer';
 import { Locale } from '@/types';
 import { getDictionary } from '@/lib/i18n/get-dictionary';
@@ -38,6 +39,7 @@ export default async function RootLayout({
   return (
     <html lang={validLocale}>
       <body className={`${inter.className} min-h-screen bg-dark-900 text-foreground flex flex-col`}>
+        <Navbar lang={validLocale as Locale} />
         <main className="flex-grow">{children}</main>
         <Footer lang={validLocale as Locale} />
       </body>
