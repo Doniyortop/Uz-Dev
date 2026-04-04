@@ -7,10 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LayoutDashboard, Settings, Package, LogOut, User, Bell, CreditCard } from 'lucide-react';
-import { getSession, signOut } from '@/lib/supabase/auth';
-import { getProfile } from '@/lib/supabase/profiles';
-import { getServicesByFreelancerId } from '@/lib/supabase/services';
-import { updateProfile } from '@/lib/supabase/profiles';
+import { simpleAuth } from '@/lib/auth-simple';
 
 type Tab = 'overview' | 'items' | 'settings';
 
@@ -21,8 +18,7 @@ export default function DashboardPage({
 }) {
   const { lang } = use(params);
   const router = useRouter();
-  const [session, setSession] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
   const [services, setServices] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [isEditing, setIsEditing] = useState(false);
@@ -34,31 +30,24 @@ export default function DashboardPage({
   useEffect(() => {
     const loadData = async () => {
       try {
-        const sessionData = await getSession();
-        if (!sessionData) {
-          console.log('No session found, redirecting to login');
+        const currentUser = simpleAuth.getCurrentUser();
+        if (!currentUser) {
+          console.log('No user found, redirecting to login');
           router.push(`/${lang}/login`);
           return;
         }
 
-        console.log('Session found:', sessionData.user?.email);
-        setSession(sessionData);
-
-        const [profileData, servicesData] = await Promise.all([
-          getProfile(sessionData.user.id).catch(err => {
-            console.log('Profile not found, creating default');
-            return null;
-          }),
-          getServicesByFreelancerId(sessionData.user.id).catch(err => {
-            console.log('Services not found');
-            return [];
-          })
-        ]);
-
-        setProfile(profileData);
-        setServices(servicesData);
-        setProfileName(profileData?.full_name || '');
-        setProfileBio(profileData?.bio || '');
+        console.log('User found:', currentUser.email);
+        setUser(currentUser);
+        setProfileName(currentUser.fullName || '');
+        setProfileBio(currentUser.bio || '');
+        
+        // Mock services for demo
+        const mockServices = [
+          { id: '1', title: 'Веб-разработка', price: 100, category: 'web-development' },
+          { id: '2', title: 'Мобильное приложение', price: 200, category: 'mobile-development' }
+        ];
+        setServices(mockServices);
       } catch (error) {
         console.error('Error loading dashboard data:', error);
         router.push(`/${lang}/login`);
@@ -72,10 +61,7 @@ export default function DashboardPage({
 
   const handleLogout = async () => {
     try {
-      await signOut();
-      localStorage.removeItem('is_auth');
-      localStorage.removeItem('onboarded');
-      window.dispatchEvent(new Event('auth-change'));
+      simpleAuth.logout();
       router.push(`/${lang}`);
     } catch (error) {
       console.error('Error logging out:', error);
@@ -84,18 +70,15 @@ export default function DashboardPage({
   };
 
   const handleSaveProfile = async () => {
-    if (!session) return;
+    if (!user) return;
     
     try {
-      await updateProfile(session.user.id, {
-        full_name: profileName,
-        bio: profileBio
-      });
-      
-      setProfile((prev: any) => ({
-        ...prev,
-        full_name: profileName,
-        bio: profileBio
+      // In real app, save to backend
+      const updatedUser = { ...user, fullName: profileName, bio: profileBio };
+      setUser(updatedUser);
+      localStorage.setItem('simple_auth', JSON.stringify({
+        user: updatedUser,
+        expires: Date.now() + (24 * 60 * 60 * 1000)
       }));
       
       setIsEditing(false);
@@ -107,11 +90,15 @@ export default function DashboardPage({
   };
 
   const handleRoleChange = async (newRole: 'freelancer' | 'client') => {
-    if (!session) return;
+    if (!user) return;
     
     try {
-      await updateProfile(session.user.id, { role: newRole });
-      setProfile((prev: any) => ({ ...prev, role: newRole }));
+      const updatedUser = { ...user, role: newRole };
+      setUser(updatedUser);
+      localStorage.setItem('simple_auth', JSON.stringify({
+        user: updatedUser,
+        expires: Date.now() + (24 * 60 * 60 * 1000)
+      }));
       window.location.reload();
     } catch (error) {
       console.error('Error updating role:', error);
@@ -133,7 +120,7 @@ export default function DashboardPage({
     );
   }
 
-  if (!session || !profile) {
+  if (!user) {
     return (
       <div className="container mx-auto px-4 py-12 text-center">
         <h1 className="text-2xl font-bold text-white mb-4">
