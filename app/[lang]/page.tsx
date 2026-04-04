@@ -67,6 +67,14 @@ export default async function Home({
                 {dictionary.common.categories}
               </Button>
             </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-4">
+              <Button variant="ghost" size="lg" href={`/${lang}/login`} className="w-full sm:w-auto">
+                {lang === 'ru' ? 'Войти' : 'Kirish'}
+              </Button>
+              <Button variant="primary" size="lg" href={`/${lang}/register`} className="w-full sm:w-auto">
+                {lang === 'ru' ? 'Регистрация' : 'Ro\'yxatdan o\'tish'}
+              </Button>
+            </div>
           </FadeIn>
         </div>
       </section>

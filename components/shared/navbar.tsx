@@ -97,6 +97,11 @@ export default function Navbar({ lang }: NavbarProps) {
                     {lang === 'ru' ? 'Войти' : 'Kirish'}
                   </Button>
                 </Link>
+                <Link href={`/${lang}/register`}>
+                  <Button variant="primary" size="sm">
+                    {lang === 'ru' ? 'Регистрация' : 'Ro\'yxatdan o\'tish'}
+                  </Button>
+                </Link>
               </>
             )}
           </div>
@@ -156,15 +161,23 @@ export default function Navbar({ lang }: NavbarProps) {
                   </Button>
                 </>
               ) : (
-                <Link 
-                  href={`/${lang}/login`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  <Button variant="ghost" size="sm" className="w-full">
-                    <User className="w-4 h-4 mr-2" />
+                <>
+                  <Link 
+                    href={`/${lang}/login`}
+                    className="text-slate-300 hover:text-white transition-colors py-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
                     {lang === 'ru' ? 'Войти' : 'Kirish'}
-                  </Button>
-                </Link>
+                  </Link>
+                  <Link 
+                    href={`/${lang}/register`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Button variant="primary" size="sm" className="w-full">
+                      {lang === 'ru' ? 'Регистрация' : 'Ro\'yxatdan o\'tish'}
+                    </Button>
+                  </Link>
+                </>
               )}
             </div>
           </div>
