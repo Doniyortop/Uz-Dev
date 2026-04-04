@@ -6,12 +6,10 @@ export interface SimpleUser {
   email: string;
   fullName: string;
   role: 'freelancer' | 'client';
-  avatar?: string;
   onboarded: boolean;
+  is_online: boolean;
+  rating: number;
   bio?: string;
-  rating?: number;
-  is_online?: boolean;
-  createdAt: string;
 }
 
 export interface SimpleAuthState {
@@ -24,35 +22,32 @@ const MOCK_USERS: SimpleUser[] = [
   {
     id: '1',
     email: 'freelancer@example.com',
-    fullName: 'Али Фрилансер',
+    fullName: 'John Doe',
     role: 'freelancer',
     onboarded: true,
-    bio: 'Профессиональный веб-разработчик с 5-летним опытом',
-    rating: 4.8,
     is_online: true,
-    createdAt: new Date().toISOString()
+    rating: 5.0,
+    bio: 'Professional web developer with 5+ years of experience'
   },
   {
     id: '2',
     email: 'client@example.com',
-    fullName: 'Боб Заказчик',
+    fullName: 'Jane Smith',
     role: 'client',
     onboarded: true,
-    bio: 'Ищу надежных исполнителей для своих проектов',
-    rating: 4.5,
-    is_online: false,
-    createdAt: new Date().toISOString()
+    is_online: true,
+    rating: 4.8,
+    bio: 'Looking for talented developers for my projects'
   },
   {
     id: '3',
     email: 'admin@example.com',
-    fullName: 'Админ',
+    fullName: 'Admin User',
     role: 'freelancer',
     onboarded: true,
-    bio: 'Администратор платформы',
-    rating: 5.0,
     is_online: true,
-    createdAt: new Date().toISOString()
+    rating: 5.0,
+    bio: 'Platform administrator'
   }
 ];
 
@@ -80,23 +75,37 @@ export const simpleAuth = {
   // Login with email/password
   async login(email: string, password: string): Promise<SimpleUser> {
     // Simple validation - accept any password for demo users
-    const user = MOCK_USERS.find(u => u.email.toLowerCase() === email.toLowerCase());
-    
-    if (!user) {
-      throw new Error('Пользователь не найден');
+    // Check if user exists
+    const existingUser = MOCK_USERS.find(u => u.email === email);
+    if (existingUser) {
+      return existingUser;
     }
-    
-    // Save to localStorage
-    const authData = {
-      user,
-      expires: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
-    };
-    
-    localStorage.setItem('simple_auth', JSON.stringify(authData));
-    localStorage.setItem('is_auth', 'true');
-    localStorage.setItem('onboarded', 'true');
-    
-    return user;
+  
+    // If user doesn't exist in mock data, check localStorage for newly registered users
+    const storedUsers = JSON.parse(localStorage.getItem('registered_users') || '[]');
+    const registeredUser = storedUsers.find((u: any) => u.email === email);
+  
+    if (registeredUser && registeredUser.password === password) {
+      const user = {
+        id: registeredUser.id,
+        email: registeredUser.email,
+        fullName: registeredUser.fullName,
+        role: registeredUser.role,
+        onboarded: true,
+        is_online: true,
+        rating: 5.0,
+        bio: registeredUser.bio || ''
+      };
+      
+      localStorage.setItem('simple_auth', JSON.stringify({
+        user,
+        expires: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
+      }));
+      
+      return user;
+    }
+  
+    throw new Error('Invalid email or password');
   },
 
   // Register new user
@@ -113,11 +122,20 @@ export const simpleAuth = {
       email,
       fullName,
       role,
-      onboarded: false,
-      createdAt: new Date().toISOString()
+      onboarded: true,
+      is_online: true,
+      rating: 5.0,
+      bio: ''
     };
     
-    // Save to localStorage (in real app, save to database)
+    // Save to localStorage
+    const storedUsers = JSON.parse(localStorage.getItem('registered_users') || '[]');
+    storedUsers.push({
+      ...newUser,
+      password: 'registered' // We'll store this as a placeholder
+    });
+    localStorage.setItem('registered_users', JSON.stringify(storedUsers));
+    
     const authData = {
       user: newUser,
       expires: Date.now() + (24 * 60 * 60 * 1000)

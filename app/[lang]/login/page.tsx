@@ -7,6 +7,7 @@ import { Locale, Dictionary } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
+import { signInWithEmailAndPassword, getSession } from '@/lib/supabase/auth';
 import { simpleAuth } from '@/lib/auth-simple';
 
 export default function LoginPage({
@@ -31,13 +32,11 @@ export default function LoginPage({
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const user = simpleAuth.getCurrentUser();
+        const session = await getSession();
+        const user = session?.user || simpleAuth.getCurrentUser();
+        
         if (user) {
-          if (user.onboarded) {
-            router.push(`/${lang}/dashboard`);
-          } else {
-            router.push(`/${lang}/onboarding`);
-          }
+          router.push(`/${lang}/dashboard`);
         }
       } catch (error) {
         console.log('No active session');
@@ -52,13 +51,18 @@ export default function LoginPage({
     setError(null);
     
     try {
-      const user = await simpleAuth.login(email, password);
-      
-      if (user.onboarded) {
-        router.push(`/${lang}/dashboard`);
-      } else {
-        router.push(`/${lang}/onboarding`);
+      // Try Supabase first, then fallback to simple auth
+      let user;
+      try {
+        const result = await signInWithEmailAndPassword(email, password);
+        user = result.user;
+      } catch (supabaseError) {
+        // Fallback to simple auth if Supabase fails
+        const simpleResult = await simpleAuth.login(email, password);
+        user = simpleResult;
       }
+      
+      router.push(`/${lang}/dashboard`);
     } catch (err: any) {
       setError(err.message || (lang === 'ru' ? 'Ошибка входа' : 'Kirishda xatolik'));
     } finally {

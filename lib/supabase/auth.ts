@@ -56,13 +56,13 @@ export const signInWithEmailAndPassword = async (email: string, password: string
   if (!supabase) {
     // Fallback to simple auth
     const { simpleAuth } = await import('../auth-simple');
-    return await simpleAuth.login(email, password);
+    return { user: await simpleAuth.login(email, password) };
   }
 
   try {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
-    return data;
+    return { user: data.user };
   } catch (error) {
     console.error('Error signing in:', error);
     throw error;
