@@ -152,7 +152,7 @@ export default function DashboardPage({
             className={`w-full justify-start gap-3 py-6 ${activeTab !== 'items' ? 'text-slate-400' : ''}`}
           >
             <Package className="w-5 h-5" />
-            {profile.role === 'freelancer' 
+            {user.role === 'freelancer' 
               ? (lang === 'ru' ? 'Мои услуги' : 'Mening xizmatlarim')
               : (lang === 'ru' ? 'Мои заказы' : 'Mening buyurtmalarim')}
           </Button>
@@ -186,7 +186,7 @@ export default function DashboardPage({
                   {lang === 'ru' ? 'Добро пожаловать!' : 'Xush kelibsiz!'}
                 </h1>
                 <div className="text-sm text-slate-400">
-                  Role: <span className="text-primary font-bold uppercase">{profile.role}</span>
+                  Role: <span className="text-primary font-bold uppercase">{user.role}</span>
                 </div>
               </div>
 
@@ -194,14 +194,14 @@ export default function DashboardPage({
                 <Card>
                   <CardHeader className="pb-2">
                     <CardTitle className="text-sm font-medium text-slate-400 text-base">
-                      {profile.role === 'freelancer' 
+                      {user.role === 'freelancer' 
                         ? (lang === 'ru' ? 'Всего услуг' : 'Jami xizmatlar')
                         : (lang === 'ru' ? 'Активные заказы' : 'Faol buyurtmalar')}
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="text-3xl font-bold text-white">
-                      {profile.role === 'freelancer' ? services.length : 0}
+                      {user.role === 'freelancer' ? services.length : 0}
                     </div>
                   </CardContent>
                 </Card>
@@ -213,7 +213,7 @@ export default function DashboardPage({
                   </CardHeader>
                   <CardContent>
                     <div className="text-3xl font-bold text-white">
-                      {profile.rating?.toFixed(1) || '0.0'}
+                      {user.rating?.toFixed(1) || '0.0'}
                     </div>
                   </CardContent>
                 </Card>
@@ -225,16 +225,16 @@ export default function DashboardPage({
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-2">
-                      <div className={`w-3 h-3 rounded-full ${profile.is_online ? 'bg-green-500' : 'bg-slate-500'}`}></div>
+                      <div className={`w-3 h-3 rounded-full ${user.is_online ? 'bg-green-500' : 'bg-slate-500'}`}></div>
                       <span className="text-white font-medium">
-                        {profile.is_online ? (lang === 'ru' ? 'В сети' : 'Onlayn') : (lang === 'ru' ? 'Офлайн' : 'Oflayn')}
+                        {user.is_online ? (lang === 'ru' ? 'В сети' : 'Onlayn') : (lang === 'ru' ? 'Офлайн' : 'Oflayn')}
                       </span>
                     </div>
                   </CardContent>
                 </Card>
               </div>
 
-              {((profile.role === 'freelancer' && services.length === 0) || (profile.role === 'client')) && (
+              {((user.role === 'freelancer' && services.length === 0) || (user.role === 'client')) && (
                 <Card className="p-12 border-dashed border-2 border-dark-700 flex flex-col items-center justify-center text-center">
                   <div className="w-16 h-16 bg-dark-800 rounded-full flex items-center justify-center mb-6">
                     <Package className="w-8 h-8 text-slate-600" />
@@ -243,22 +243,22 @@ export default function DashboardPage({
                     {lang === 'ru' ? 'Здесь пока пусто' : 'Bu yerda hali bo\'sh'}
                   </h3>
                   <p className="text-slate-400 max-w-sm mb-6">
-                    {profile.role === 'freelancer' 
+                    {user.role === 'freelancer' 
                       ? (lang === 'ru' ? 'У вас еще нет активных услуг. Добавьте первую услугу!' : 'Sizda hali faol xizmatlar yo\'q. Birinchi xizmatingizni qo\'shing!')
                       : (lang === 'ru' ? 'У вас еще нет активных заказов. Найдите исполнителя!' : 'Sizda hali faol buyurtmalar yo\'q. Ijrochi toping!')}
                   </p>
                   <Button 
-                    href={profile.role === 'freelancer' ? `/${lang}/dashboard/services/new` : `/${lang}/services`}
+                    href={user.role === 'freelancer' ? `/${lang}/dashboard/services/new` : `/${lang}/services`}
                     className="px-8"
                   >
-                    {profile.role === 'freelancer' 
+                    {user.role === 'freelancer' 
                       ? (lang === 'ru' ? 'Добавить услугу' : 'Xizmat qo\'shish')
                       : (lang === 'ru' ? 'Найти исполнителя' : 'Ijrochi topish')}
                   </Button>
                 </Card>
               )}
 
-              {profile.role === 'freelancer' && services.length > 0 && (
+              {user.role === 'freelancer' && services.length > 0 && (
                 <div className="space-y-6">
                   <h2 className="text-xl font-bold text-white">
                     {lang === 'ru' ? 'Ваши последние услуги' : 'Oxirgi xizmatlaringiz'}
@@ -302,18 +302,18 @@ export default function DashboardPage({
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold text-white">
-                  {profile.role === 'freelancer' 
+                  {user.role === 'freelancer' 
                     ? (lang === 'ru' ? 'Мои услуги' : 'Mening xizmatlarim')
                     : (lang === 'ru' ? 'Мои заказы' : 'Mening buyurtmalarim')}
                 </h1>
-                {profile.role === 'freelancer' && (
+                {user.role === 'freelancer' && (
                   <Button href={`/${lang}/dashboard/services/new`} size="sm">
                     {lang === 'ru' ? 'Добавить' : 'Qo\'shish'}
                   </Button>
                 )}
               </div>
 
-              {services.length > 0 && profile.role === 'freelancer' ? (
+              {services.length > 0 && user.role === 'freelancer' ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {services.map((service) => (
                     <Card key={service.id} className="overflow-hidden group border-dark-700 hover:border-primary/50 transition-all">
@@ -357,10 +357,10 @@ export default function DashboardPage({
                     {lang === 'ru' ? 'Список пуст' : 'Ro\'yxat bo\'sh'}
                   </p>
                   <Button 
-                    href={profile.role === 'freelancer' ? `/${lang}/dashboard/services/new` : `/${lang}/services`}
+                    href={user.role === 'freelancer' ? `/${lang}/dashboard/services/new` : `/${lang}/services`}
                     className="mt-6"
                   >
-                    {profile.role === 'freelancer' 
+                    {user.role === 'freelancer' 
                       ? (lang === 'ru' ? 'Добавить услугу' : 'Xizmat qo\'shish')
                       : (lang === 'ru' ? 'Найти исполнителя' : 'Ijrochi topish')}
                   </Button>
@@ -387,15 +387,15 @@ export default function DashboardPage({
                   <Card className="p-6 space-y-6">
                     <div className="flex items-center gap-4">
                       <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                        {profile.avatar_url ? (
-                          <img src={profile.avatar_url} alt={profile.full_name} className="w-full h-full rounded-full object-cover" />
+                        {user.avatar_url ? (
+                          <img src={user.avatar_url} alt={user.fullName} className="w-full h-full rounded-full object-cover" />
                         ) : (
                           <User className="w-8 h-8 text-primary" />
                         )}
                       </div>
                       <div>
-                        <h3 className="font-bold text-white text-lg">{profile.full_name}</h3>
-                        <p className="text-slate-400 text-sm line-clamp-1">{profile.bio}</p>
+                        <h3 className="font-bold text-white text-lg">{user.fullName}</h3>
+                        <p className="text-slate-400 text-sm line-clamp-1">{user.bio}</p>
                       </div>
                     </div>
                     <Button 
@@ -454,15 +454,15 @@ export default function DashboardPage({
                         <h3 className="font-bold text-white text-lg">{lang === 'ru' ? 'Смена роли' : 'Rolni o\'zgartirish'}</h3>
                         <p className="text-slate-400 text-sm">
                           {lang === 'ru' 
-                            ? `Текущая роль: ${profile.role === 'freelancer' ? 'Фрилансер' : 'Заказчик'}` 
-                            : `Hozirgi rol: ${profile.role === 'freelancer' ? 'Frilanser' : 'Mijoz'}`}
+                            ? `Текущая роль: ${user.role === 'freelancer' ? 'Фрилансер' : 'Заказчик'}` 
+                            : `Hozirgi rol: ${user.role === 'freelancer' ? 'Frilanser' : 'Mijoz'}`}
                         </p>
                       </div>
                     </div>
                     <Button 
                       variant="primary" 
                       className="w-full"
-                      onClick={() => handleRoleChange(profile.role === 'freelancer' ? 'client' : 'freelancer')}
+                      onClick={() => handleRoleChange(user.role === 'freelancer' ? 'client' : 'freelancer')}
                     >
                       {lang === 'ru' ? 'Переключить роль' : 'Rolni almashtirish'}
                     </Button>
