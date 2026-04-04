@@ -2,9 +2,9 @@
 
 import { use } from 'react';
 import { Locale } from '@/types';
-import { getCategories } from '@/lib/supabase/categories';
-import { createService } from '@/lib/supabase/services';
-import { getSession } from '@/lib/supabase/auth';
+import { getCategories } from '@/lib/mock-services';
+import { createService } from '@/lib/mock-services';
+import { simpleAuth } from '@/lib/auth-simple';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft, Save, Upload } from 'lucide-react';
@@ -37,7 +37,7 @@ export default function NewServicePage({
   useEffect(() => {
     const loadData = async () => {
       try {
-        const session = await getSession();
+        const session = simpleAuth.getCurrentUser();
         if (!session) {
           router.push(`/${lang}/login`);
           return;
@@ -92,7 +92,7 @@ export default function NewServicePage({
     setSubmitting(true);
     
     try {
-      const session = await getSession();
+      const session = simpleAuth.getCurrentUser();
       if (!session) {
         router.push(`/${lang}/login`);
         return;
@@ -104,7 +104,7 @@ export default function NewServicePage({
         description_ru: formData.description_ru,
         description_uz: formData.description_uz,
         price: parseInt(formData.price),
-        freelancer_id: session.user.id,
+        freelancer_id: session.id,
         category_id: formData.category_id,
         tags: formData.tags,
         image_url: formData.image_url || null,

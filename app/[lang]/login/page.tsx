@@ -7,7 +7,6 @@ import { Locale, Dictionary } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
-import { signInWithEmailAndPassword, getSession } from '@/lib/supabase/auth';
 import { simpleAuth } from '@/lib/auth-simple';
 
 export default function LoginPage({
@@ -32,9 +31,7 @@ export default function LoginPage({
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const session = await getSession();
-        const user = session?.user || simpleAuth.getCurrentUser();
-        
+        const user = simpleAuth.getCurrentUser();
         if (user) {
           router.push(`/${lang}/dashboard`);
         }
@@ -51,17 +48,7 @@ export default function LoginPage({
     setError(null);
     
     try {
-      // Try Supabase first, then fallback to simple auth
-      let user;
-      try {
-        const result = await signInWithEmailAndPassword(email, password);
-        user = result.user;
-      } catch (supabaseError) {
-        // Fallback to simple auth if Supabase fails
-        const simpleResult = await simpleAuth.login(email, password);
-        user = simpleResult;
-      }
-      
+      const user = await simpleAuth.login(email, password);
       router.push(`/${lang}/dashboard`);
     } catch (err: any) {
       setError(err.message || (lang === 'ru' ? 'Ошибка входа' : 'Kirishda xatolik'));

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Locale } from '@/types';
-import { getSession, signOut } from '@/lib/supabase/auth';
+import { simpleAuth } from '@/lib/auth-simple';
 import { Button } from '@/components/ui/button';
 import { Menu, X, LogOut, User, Briefcase } from 'lucide-react';
 import Link from 'next/link';
@@ -20,8 +20,8 @@ export default function Navbar({ lang }: NavbarProps) {
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const session = await getSession();
-        setUser(session?.user || null);
+        const currentUser = simpleAuth.getCurrentUser();
+        setUser(currentUser);
       } catch (error) {
         console.error('Error loading user:', error);
       }
@@ -32,7 +32,7 @@ export default function Navbar({ lang }: NavbarProps) {
 
   const handleLogout = async () => {
     try {
-      await signOut();
+      simpleAuth.logout();
       setUser(null);
       router.push(`/${lang}`);
     } catch (error) {

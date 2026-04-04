@@ -2,8 +2,8 @@
 
 import { use } from 'react';
 import { Locale } from '@/types';
-import { getCategories } from '@/lib/supabase/categories';
-import { getServices } from '@/lib/supabase/services';
+import { getCategories } from '@/lib/mock-services';
+import { getServices } from '@/lib/mock-services';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';

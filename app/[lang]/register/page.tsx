@@ -2,13 +2,13 @@
 
 import { use } from 'react';
 import { Locale } from '@/types';
-import { signUpWithEmailAndPassword } from '@/lib/supabase/auth';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { User, Mail, Lock, Briefcase, ArrowLeft, Eye, EyeOff } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { simpleAuth } from '@/lib/auth-simple';
 
 export default function RegisterPage({
   params,
@@ -33,9 +33,8 @@ export default function RegisterPage({
     // Check if user is already logged in
     const checkAuth = async () => {
       try {
-        const { getSession } = await import('@/lib/supabase/auth');
-        const session = await getSession();
-        if (session) {
+        const user = simpleAuth.getCurrentUser();
+        if (user) {
           router.push(`/${lang}/dashboard`);
         }
       } catch (error) {
@@ -74,11 +73,11 @@ export default function RegisterPage({
     setLoading(true);
     
     try {
-      await signUpWithEmailAndPassword(formData.email, formData.password, formData.fullName);
+      await simpleAuth.register(formData.email, formData.fullName, formData.role as 'freelancer' | 'client');
       
       alert(lang === 'ru' 
-        ? 'Регистрация успешна! Проверьте почту для подтверждения.' 
-        : 'Ro\'yxatdan o\'tish muvaffaqiyatli! Tasdiqlash uchun pochtangizni tekshiring.');
+        ? 'Регистрация успешна! Теперь вы можете войти.' 
+        : 'Ro\'yxatdan o\'tish muvaffaqiyatli! Endi kirishingiz mumkin.');
       
       router.push(`/${lang}/login`);
     } catch (error: any) {

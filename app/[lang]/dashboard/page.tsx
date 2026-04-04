@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { LayoutDashboard, Settings, Package, LogOut, User, Bell, CreditCard } from 'lucide-react';
-import { getSession, signOut } from '@/lib/supabase/auth';
 import { simpleAuth } from '@/lib/auth-simple';
 
 type Tab = 'overview' | 'items' | 'settings';
@@ -31,14 +30,7 @@ export default function DashboardPage({
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Try Supabase first, then fallback to simple auth
-        let currentUser;
-        try {
-          const session = await getSession();
-          currentUser = session?.user;
-        } catch {
-          currentUser = simpleAuth.getCurrentUser();
-        }
+        const currentUser = simpleAuth.getCurrentUser();
         
         if (!currentUser) {
           console.log('No user found, redirecting to login');
@@ -70,12 +62,7 @@ export default function DashboardPage({
 
   const handleLogout = async () => {
     try {
-      // Try Supabase first, then fallback to simple auth
-      try {
-        await signOut();
-      } catch {
-        simpleAuth.logout();
-      }
+      simpleAuth.logout();
       router.push(`/${lang}`);
     } catch (error) {
       console.error('Error logging out:', error);

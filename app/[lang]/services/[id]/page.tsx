@@ -2,8 +2,8 @@
 
 import { use } from 'react';
 import { Locale } from '@/types';
-import { getServiceById } from '@/lib/supabase/services';
-import { getReviewsByServiceId, createReview } from '@/lib/supabase/reviews';
+import { getServiceById } from '@/lib/mock-services';
+import { getReviewsByServiceId, createReview } from '@/lib/mock-services';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -11,7 +11,7 @@ import { Star, MapPin, Clock, Mail, MessageCircle, Send } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import ReviewForm from '@/components/shared/review-form';
+// import ReviewForm from '@/components/shared/review-form';
 
 export default function ServicePage({
   params,
@@ -174,12 +174,14 @@ export default function ServicePage({
             </div>
 
             {showReviewForm && (
-              <ReviewForm 
-                serviceId={id}
-                onSubmit={handleReviewSubmit}
-                onCancel={() => setShowReviewForm(false)}
-                lang={lang}
-              />
+              <div className="bg-dark-800 border border-dark-700 rounded-lg p-6">
+                <h3 className="text-white font-bold mb-4">
+                  {lang === 'ru' ? 'Оставить отзыв' : 'Sharx qoldirish'}
+                </h3>
+                <p className="text-slate-400">
+                  {lang === 'ru' ? 'Функция отзывов временно отключена' : 'Sharx funksiyasi vaqtincha o\'chirilgan'}
+                </p>
+              </div>
             )}
 
             <div className="space-y-4">
