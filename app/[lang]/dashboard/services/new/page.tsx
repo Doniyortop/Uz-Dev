@@ -122,18 +122,26 @@ export default function NewServicePage({
       }
 
       const serviceData = {
+        id: Date.now().toString(),
         title: formData.title,
+        title_ru: formData.title,
+        title_uz: formData.title,
         description: formData.description,
+        description_ru: formData.description,
+        description_uz: formData.description,
         price: parseInt(formData.price),
         freelancer_id: session.id,
         category_id: formData.category_id,
         tags: formData.tags,
-        images: formData.images.map(file => file.name),
+        images: formData.images.map(file => URL.createObjectURL(file)),
         is_active: true
       };
 
-      const newService = await createService(serviceData);
-      
+      // Save to localStorage
+      const storedServices = JSON.parse(localStorage.getItem('created_services') || '[]');
+      storedServices.push(serviceData);
+      localStorage.setItem('created_services', JSON.stringify(storedServices));
+
       alert(lang === 'ru' ? 'Услуга успешно создана!' : 'Xizmat muvaffaqiyatli yaratildi!');
       router.push(`/${lang}/dashboard`);
     } catch (error) {

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Locale } from '@/types';
 import { simpleAuth } from '@/lib/auth-simple';
 import { Button } from '@/components/ui/button';
-import { Menu, X, LogOut, User, Briefcase } from 'lucide-react';
+import { Menu, X, LogOut, User, Briefcase, Home } from 'lucide-react';
 import Link from 'next/link';
 
 interface NavbarProps {
@@ -79,12 +79,18 @@ export default function Navbar({ lang }: NavbarProps) {
             {user ? (
               <>
                 <Link href={`/${lang}/dashboard`}>
-                  <Button variant="ghost" size="sm">
-                    <Briefcase className="w-4 h-4 mr-2" />
-                    {lang === 'ru' ? 'Дашборд' : 'Boshqaruv paneli'}
+                  <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white">
+                    <Home className="w-4 h-4 mr-2" />
+                    {lang === 'ru' ? 'Дашборд' : 'Dashboard'}
                   </Button>
                 </Link>
-                <Button variant="outline" size="sm" onClick={handleLogout}>
+                <Link href={`/${lang}/profile`}>
+                  <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white">
+                    <User className="w-4 h-4 mr-2" />
+                    {lang === 'ru' ? 'Профиль' : 'Profil'}
+                  </Button>
+                </Link>
+                <Button variant="ghost" size="sm" onClick={handleLogout} className="text-slate-300 hover:text-white">
                   <LogOut className="w-4 h-4 mr-2" />
                   {lang === 'ru' ? 'Выход' : 'Chiqish'}
                 </Button>
@@ -149,6 +155,13 @@ export default function Navbar({ lang }: NavbarProps) {
                     onClick={() => setIsMenuOpen(false)}
                   >
                     {lang === 'ru' ? 'Дашборд' : 'Boshqaruv paneli'}
+                  </Link>
+                  <Link 
+                    href={`/${lang}/profile`}
+                    className="text-slate-300 hover:text-white transition-colors py-2"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {lang === 'ru' ? 'Профиль' : 'Profil'}
                   </Link>
                   <Button 
                     variant="outline" 

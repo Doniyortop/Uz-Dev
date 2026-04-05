@@ -48,7 +48,11 @@ export default function DashboardPage({
           { id: '1', title: 'Веб-разработка', price: 100, category: 'web-development' },
           { id: '2', title: 'Мобильное приложение', price: 200, category: 'mobile-development' }
         ];
-        setServices(mockServices);
+        
+        // Load services from localStorage or use mock
+        const storedServices = JSON.parse(localStorage.getItem('created_services') || '[]');
+        const allServices = [...storedServices, ...mockServices];
+        setServices(allServices);
       } catch (error) {
         console.error('Error loading dashboard data:', error);
         router.push(`/${lang}/login`);
@@ -268,8 +272,10 @@ export default function DashboardPage({
                     {services.slice(0, 3).map((service) => (
                       <Card key={service.id} className="overflow-hidden group border-dark-700 hover:border-primary/50 transition-all">
                         <div className="h-24 bg-dark-700 relative">
-                          {service.image ? (
-                            <img src={service.image} alt={service.title_ru} className="w-full h-full object-cover opacity-60" />
+                          {service.images && service.images.length > 0 ? (
+                            <img src={service.images[0]} alt={service.title || service.title_ru || service.title_uz} className="w-full h-full object-cover opacity-60" />
+                          ) : service.image_url ? (
+                            <img src={service.image_url} alt={service.title || service.title_ru || service.title_uz} className="w-full h-full object-cover opacity-60" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-slate-600">
                               <Package className="w-6 h-6" />
@@ -277,17 +283,17 @@ export default function DashboardPage({
                           )}
                           <div className="absolute top-2 right-2">
                             <Badge variant="secondary" className="bg-dark-900/80 backdrop-blur-sm text-primary">
-                              {service.price.toLocaleString()} UZS
+                              ${service.price.toLocaleString()}
                             </Badge>
                           </div>
                         </div>
                         <CardContent className="p-4">
                           <h3 className="font-bold text-white text-sm line-clamp-1">
-                            {lang === 'ru' ? service.title_ru : service.title_uz}
+                            {service.title || (lang === 'ru' ? service.title_ru : service.title_uz)}
                           </h3>
                           <div className="flex justify-between items-center mt-2">
                             <span className="text-[10px] text-slate-500 uppercase font-bold">
-                              {service.categories?.name_ru || service.category_id}
+                              {service.category_id}
                             </span>
                           </div>
                         </CardContent>
