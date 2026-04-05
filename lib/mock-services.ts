@@ -2,15 +2,19 @@
 
 export interface Service {
   id: string;
-  title_ru: string;
-  title_uz: string;
-  description_ru: string;
-  description_uz: string;
+  title?: string;
+  title_ru?: string;
+  title_uz?: string;
+  description?: string;
+  description_ru?: string;
+  description_uz?: string;
   price: number;
   freelancer_id: string;
   category_id: string;
   tags: string[];
   is_active: boolean;
+  images?: string[];
+  image_url?: string;
 }
 
 export interface Category {
@@ -144,8 +148,9 @@ export const getServices = async (filters?: {
   
   if (filters?.search) {
     filtered = filtered.filter(s => 
-      s.title_ru.toLowerCase().includes(filters.search!.toLowerCase()) ||
-      s.title_uz.toLowerCase().includes(filters.search!.toLowerCase())
+      (s.title_ru || '').toLowerCase().includes(filters.search!.toLowerCase()) ||
+      (s.title_uz || '').toLowerCase().includes(filters.search!.toLowerCase()) ||
+      (s.title || '').toLowerCase().includes(filters.search!.toLowerCase())
     );
   }
   
@@ -156,10 +161,22 @@ export const getServiceById = async (id: string): Promise<Service | null> => {
   return mockServices.find(s => s.id === id) || null;
 };
 
-export const createService = async (service: Omit<Service, 'id'>): Promise<Service> => {
+export const createService = async (service: Partial<Service>): Promise<Service> => {
   const newService: Service = {
-    ...service,
-    id: Date.now().toString()
+    id: Date.now().toString(),
+    title: service.title || '',
+    title_ru: service.title || '',
+    title_uz: service.title || '',
+    description: service.description || '',
+    description_ru: service.description || '',
+    description_uz: service.description || '',
+    price: service.price || 0,
+    freelancer_id: service.freelancer_id || '',
+    category_id: service.category_id || '',
+    tags: service.tags || [],
+    is_active: service.is_active ?? true,
+    images: service.images || [],
+    image_url: service.image_url
   };
   mockServices.push(newService);
   return newService;

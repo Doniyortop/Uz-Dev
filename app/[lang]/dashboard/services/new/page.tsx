@@ -23,16 +23,15 @@ export default function NewServicePage({
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    title_ru: '',
-    title_uz: '',
-    description_ru: '',
-    description_uz: '',
+    title: '',
+    description: '',
     price: '',
     category_id: '',
     tags: [] as string[],
-    image_url: ''
+    images: [] as File[]
   });
   const [tagInput, setTagInput] = useState('');
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -62,6 +61,30 @@ export default function NewServicePage({
     }));
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    
+    if (formData.images.length + files.length > 8) {
+      alert(lang === 'ru' ? 'Можно добавить не более 8 изображений' : '8 tasdan ortiq rasm qo\'shib bo\'lmaydi');
+      return;
+    }
+    
+    const newImages = [...formData.images, ...files].slice(0, 8);
+    setFormData(prev => ({ ...prev, images: newImages }));
+    
+    // Create previews
+    const newPreviews = newImages.map(file => URL.createObjectURL(file));
+    setImagePreviews(newPreviews);
+  };
+
+  const removeImage = (index: number) => {
+    const newImages = formData.images.filter((_, i) => i !== index);
+    const newPreviews = imagePreviews.filter((_, i) => i !== index);
+    
+    setFormData(prev => ({ ...prev, images: newImages }));
+    setImagePreviews(newPreviews);
+  };
+
   const handleAddTag = () => {
     const tag = tagInput.trim();
     if (tag && !formData.tags.includes(tag)) {
@@ -83,8 +106,8 @@ export default function NewServicePage({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title_ru || !formData.title_uz || !formData.description_ru || 
-        !formData.description_uz || !formData.price || !formData.category_id) {
+    if (!formData.title || !formData.description || 
+        !formData.price || !formData.category_id) {
       alert(lang === 'ru' ? 'Заполните все обязательные поля' : 'Barcha majburiy maydonlarni to\'ldiring');
       return;
     }
@@ -99,15 +122,13 @@ export default function NewServicePage({
       }
 
       const serviceData = {
-        title_ru: formData.title_ru,
-        title_uz: formData.title_uz,
-        description_ru: formData.description_ru,
-        description_uz: formData.description_uz,
+        title: formData.title,
+        description: formData.description,
         price: parseInt(formData.price),
         freelancer_id: session.id,
         category_id: formData.category_id,
         tags: formData.tags,
-        image_url: formData.image_url || null,
+        images: formData.images.map(file => file.name),
         is_active: true
       };
 
@@ -158,122 +179,134 @@ export default function NewServicePage({
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Titles */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-400">
-                  {lang === 'ru' ? 'Название (RU)' : 'Nomi (RU)'} *
-                </label>
-                <input
-                  type="text"
-                  value={formData.title_ru}
-                  onChange={(e) => handleInputChange('title_ru', e.target.value)}
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-primary"
-                  placeholder={lang === 'ru' ? 'Название услуги' : 'Xizmat nomi'}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-400">
-                  {lang === 'ru' ? 'Название (UZ)' : 'Nomi (UZ)'} *
-                </label>
-                <input
-                  type="text"
-                  value={formData.title_uz}
-                  onChange={(e) => handleInputChange('title_uz', e.target.value)}
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-primary"
-                  placeholder={lang === 'ru' ? 'Название услуги' : 'Xizmat nomi'}
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Descriptions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-400">
-                  {lang === 'ru' ? 'Описание (RU)' : 'Tavsifi (RU)'} *
-                </label>
-                <textarea
-                  value={formData.description_ru}
-                  onChange={(e) => handleInputChange('description_ru', e.target.value)}
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-primary resize-none"
-                  placeholder={lang === 'ru' ? 'Подробное описание услуги' : 'Xizmatning batafsil tavsifi'}
-                  rows={4}
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-400">
-                  {lang === 'ru' ? 'Описание (UZ)' : 'Tavsifi (UZ)'} *
-                </label>
-                <textarea
-                  value={formData.description_uz}
-                  onChange={(e) => handleInputChange('description_uz', e.target.value)}
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-primary resize-none"
-                  placeholder={lang === 'ru' ? 'Подробное описание услуги' : 'Xizmatning batafsil tavsifi'}
-                  rows={4}
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Price and Category */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-400">
-                  {lang === 'ru' ? 'Цена (UZS)' : 'Narxi (UZS)'} *
-                </label>
-                <input
-                  type="number"
-                  value={formData.price}
-                  onChange={(e) => handleInputChange('price', e.target.value)}
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-primary"
-                  placeholder="100000"
-                  min="1"
-                  required
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-400">
-                  {lang === 'ru' ? 'Категория' : 'Kategoriya'} *
-                </label>
-                <select
-                  value={formData.category_id}
-                  onChange={(e) => handleInputChange('category_id', e.target.value)}
-                  className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary"
-                  required
-                >
-                  <option value="">
-                    {lang === 'ru' ? 'Выберите категорию' : 'Kategoriyani tanlang'}
-                  </option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>
-                      {lang === 'ru' ? category.name_ru : category.name_uz}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            {/* Image URL */}
+            {/* Title */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-400">
-                {lang === 'ru' ? 'URL изображения' : 'Rasm URL'}
+                {lang === 'ru' ? 'Название услуги' : 'Xizmat nomi'} *
               </label>
               <input
-                type="url"
-                value={formData.image_url}
-                onChange={(e) => handleInputChange('image_url', e.target.value)}
+                type="text"
+                value={formData.title}
+                onChange={(e) => handleInputChange('title', e.target.value)}
                 className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-primary"
-                placeholder="https://example.com/image.jpg"
+                placeholder={lang === 'ru' ? 'Введите название услуги' : 'Xizmat nomini kiriting'}
+                required
               />
             </div>
 
-            {/* Tags */}
+            {/* Description */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-slate-400">
-                {lang === 'ru' ? 'Теги (навыки)' : 'Teglar (mahoratlar)'}
+                {lang === 'ru' ? 'Описание услуги' : 'Xizmat tavsifi'} *
+              </label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => handleInputChange('description', e.target.value)}
+                className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-primary min-h-[120px]"
+                placeholder={lang === 'ru' ? 'Подробное описание услуги' : 'Xizmatning batafsil tavsifi'}
+                required
+              />
+            </div>
+
+            {/* Price */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-400">
+                {lang === 'ru' ? 'Цена ($)' : 'Narxi ($)'} *
+              </label>
+              <input
+                type="number"
+                value={formData.price}
+                onChange={(e) => handleInputChange('price', e.target.value)}
+                className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-primary"
+                placeholder={lang === 'ru' ? 'Цена в долларах' : 'Narx dollarda'}
+                min="1"
+                required
+              />
+            </div>
+
+            {/* Category */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-400">
+                {lang === 'ru' ? 'Категория' : 'Kategoriya'} *
+              </label>
+              <select
+                value={formData.category_id}
+                onChange={(e) => handleInputChange('category_id', e.target.value)}
+                className="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary"
+                required
+              >
+                <option value="">
+                  {lang === 'ru' ? 'Выберите категорию' : 'Kategoriyani tanlang'}
+                </option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {lang === 'ru' ? category.name_ru : category.name_uz}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Images */}
+            <div className="space-y-4">
+              <label className="text-sm font-medium text-slate-400">
+                {lang === 'ru' ? 'Изображения (до 8 шт)' : 'Rasmlar (8 tagacha)'}
+              </label>
+              
+              {/* Upload Button */}
+              <div className="border-2 border-dashed border-dark-600 rounded-lg p-6">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  id="image-upload"
+                />
+                <label
+                  htmlFor="image-upload"
+                  className="flex flex-col items-center justify-center cursor-pointer"
+                >
+                  <Upload className="w-8 h-8 text-slate-400 mb-2" />
+                  <span className="text-slate-400">
+                    {lang === 'ru' 
+                      ? 'Нажмите для загрузки изображений' 
+                      : 'Rasmlarni yuklash uchun bosing'}
+                  </span>
+                  <span className="text-xs text-slate-500 mt-1">
+                    {lang === 'ru' 
+                      ? `Загружено: ${formData.images.length}/8` 
+                      : `Yuklandi: ${formData.images.length}/8`}
+                  </span>
+                </label>
+              </div>
+
+              {/* Image Previews */}
+              {imagePreviews.length > 0 && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {imagePreviews.map((preview, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={preview}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-32 object-cover rounded-lg"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Tags */}
+            <div className="space-y-4">
+              <label className="text-sm font-medium text-slate-400">
+                {lang === 'ru' ? 'Теги' : 'Teglar'}
               </label>
               <div className="flex gap-2">
                 <input
@@ -281,25 +314,31 @@ export default function NewServicePage({
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
-                  className="flex-grow bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-primary"
-                  placeholder={lang === 'ru' ? 'React, Node.js...' : 'React, Node.js...'}
+                  className="flex-1 bg-dark-700 border border-dark-600 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:border-primary"
+                  placeholder={lang === 'ru' ? 'Добавить тег' : 'Teg qo\'shish'}
                 />
-                <Button type="button" onClick={handleAddTag} variant="outline">
+                <Button
+                  type="button"
+                  onClick={handleAddTag}
+                  variant="outline"
+                  size="sm"
+                >
                   {lang === 'ru' ? 'Добавить' : 'Qo\'shish'}
                 </Button>
               </div>
+              
               {formData.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {formData.tags.map((tag) => (
+                <div className="flex flex-wrap gap-2">
+                  {formData.tags.map((tag, index) => (
                     <span
-                      key={tag}
-                      className="inline-flex items-center gap-1 px-3 py-1 bg-primary/20 text-primary rounded-full text-sm"
+                      key={index}
+                      className="bg-primary/20 text-primary px-3 py-1 rounded-full text-sm flex items-center gap-2"
                     >
                       {tag}
                       <button
                         type="button"
                         onClick={() => handleRemoveTag(tag)}
-                        className="text-primary hover:text-red-400"
+                        className="text-primary hover:text-primary/80"
                       >
                         ×
                       </button>
@@ -311,23 +350,26 @@ export default function NewServicePage({
           </CardContent>
         </Card>
 
-        {/* Actions */}
-        <div className="flex gap-4">
+        {/* Submit Button */}
+        <div className="flex justify-end gap-4">
           <Link href={`/${lang}/dashboard`}>
-            <Button variant="outline" className="flex-grow">
+            <Button variant="outline" type="button">
               {lang === 'ru' ? 'Отмена' : 'Bekor qilish'}
             </Button>
           </Link>
-          <Button 
-            type="submit" 
-            className="flex-grow"
+          <Button
+            type="submit"
             disabled={submitting}
+            className="min-w-[120px]"
           >
-            <Save className="w-4 h-4 mr-2" />
-            {submitting 
-              ? (lang === 'ru' ? 'Создание...' : 'Yaratilmoqda...')
-              : (lang === 'ru' ? 'Создать услугу' : 'Xizmat yaratish')
-            }
+            {submitting ? (
+              <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
+            ) : (
+              <>
+                <Save className="w-4 h-4 mr-2" />
+                {lang === 'ru' ? 'Сохранить' : 'Saqlash'}
+              </>
+            )}
           </Button>
         </div>
       </form>
