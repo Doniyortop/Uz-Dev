@@ -136,8 +136,8 @@ export default function ServicesPage({
                 className="w-full"
               />
               <div className="flex justify-between text-sm text-slate-400">
-                <span>0 UZS</span>
-                <span>{priceRange[1].toLocaleString()} UZS</span>
+                <span>$0</span>
+                <span>${priceRange[1].toLocaleString()}</span>
               </div>
             </div>
           </div>
@@ -146,16 +146,26 @@ export default function ServicesPage({
         {/* Main Content */}
         <main className="flex-grow">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-white mb-2">
+          <div className="mb-8 flex justify-between items-center">
+            <h1 className="text-3xl font-bold text-white">
               {lang === 'ru' ? 'Услуги' : 'Xizmatlar'}
             </h1>
-            <p className="text-slate-400">
-              {lang === 'ru' 
-                ? `Найдено ${filteredServices.length} услуг` 
-                : `${filteredServices.length} ta xizmat topildi`}
-            </p>
+            <Button
+              onClick={() => {
+                setSearchTerm('');
+                setSelectedCategory('');
+                setPriceRange([0, 10000]);
+              }}
+              variant="outline"
+            >
+              {lang === 'ru' ? 'Все услуги' : 'Barcha xizmatlar'}
+            </Button>
           </div>
+          <p className="text-slate-400">
+            {lang === 'ru' 
+              ? `Найдено ${filteredServices.length} услуг` 
+              : `${filteredServices.length} ta xizmat topildi`}
+          </p>
 
           {/* Services Grid */}
           {filteredServices.length > 0 ? (
